@@ -224,11 +224,35 @@ func QueryTraffic(explainedPolicies *matcher.Policy, trafficPath string) {
 	utils.DoOrDie(err)
 
 	for _, traffic := range *allTraffics {
-		fmt.Printf("Traffic:\n%s\n", traffic.Table())
-
-		result := explainedPolicies.IsTrafficAllowed(traffic)
-		fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
-	}
+		if (traffic.Source.Internal == nil){
+			fmt.Printf("Traffic:\n%s\n", traffic.Table())
+			result := explainedPolicies.IsTrafficAllowed(traffic)
+			fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
+		} else {
+			if (traffic.Source.Internal.Workload == nil){
+				fmt.Printf("Traffic:\n%s\n", traffic.Table())
+				result := explainedPolicies.IsTrafficAllowed(traffic)
+				fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
+			} else {
+				//logica para llamar al api de kubernetes y extraer datos del deployment o daemonset(se debe generar un json por pod)
+				// todos los json generados deben estar dentro del mismo array json, de manera similar al archivo traffic.json
+				jsonData, err := json.Marshal(traffic)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+				fmt.Println(string(jsonData))
+				fmt.Printf("Traffic:\n%s\n", traffic)
+				//finalmente usar el json generado de la siguiente manera currentTraffic, err := json.Parse[[]*matcher.Traffic](jsonData)
+				//y procesar
+				//fmt.Printf("Traffic:\n%s\n", currentTraffic.Table())
+				//result := explainedPolicies.IsTrafficAllowed(currentTraffic)
+				//fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
+			}
+		}
+			
+		}
+		
 }
 
 type SyntheticProbeConnectivityConfig struct {

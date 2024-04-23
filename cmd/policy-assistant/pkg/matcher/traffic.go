@@ -72,6 +72,7 @@ func (p *TrafficPeer) IsExternal() bool {
 }
 
 type InternalPeer struct {
+	Workload        map[string]string
 	PodLabels       map[string]string
 	NamespaceLabels map[string]string
 	Namespace       string

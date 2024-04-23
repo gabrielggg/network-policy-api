@@ -71,5 +71,37 @@
     "Protocol": "TCP",
     "ResolvedPort": 80,
     "ResolvedPortName": "serve-80-tcp"
+  },{
+    "Source": {
+      "Internal": {
+        "Workload": {"deployment": "my-deployment1"},
+        "Namespace": "a"
+      }
+    },
+    "Destination": {
+      "Internal": {
+        "Workload": {"daemonset": "my-daemonset1"},
+        "Namespace": "a"
+      }
+    },
+    "Protocol": "TCP",
+    "ResolvedPort": 80,
+    "ResolvedPortName": "serve-80-tcp"
+  },
+
+  {
+    "Source": {
+    "IP": "10.0.0.5"
+
+    },
+    "Destination": {
+      "Internal": {
+        "Workload": {"daemonset": "my-daemonset1"},
+        "Namespace": "a"
+      }
+    },
+    "Protocol": "UDP",
+    "ResolvedPort": 81,
+    "ResolvedPortName": "serve-81-udp"
   }
 ]
