@@ -26,23 +26,34 @@ func (t *Traffic) Table() string {
 	table.SetAutoMergeCells(true)
 
 	pp := fmt.Sprintf("%d (%s) on %s", t.ResolvedPort, t.ResolvedPortName, t.Protocol)
-	table.SetHeader([]string{"Port/Protocol", "Source/Dest", "Pod IP", "Namespace", "NS Labels", "Pod Labels"})
+	table.SetHeader([]string{"Port/Protocol", "Source/Dest", "Pod IP", "Namespace", "NS Labels", "Pod Labels", "Workload"})
 
 	source := []string{pp, "source", t.Source.IP}
 	if t.Source.Internal != nil {
 		i := t.Source.Internal
-		source = append(source, i.Namespace, labelsToString(i.NamespaceLabels), labelsToString(i.PodLabels))
+
+		if i.Workload != nil {
+			source = append(source, i.Namespace, labelsToString(i.NamespaceLabels), labelsToString(i.PodLabels), labelsToString(i.Workload))
+		} else {
+			source = append(source, i.Namespace, labelsToString(i.NamespaceLabels), labelsToString(i.PodLabels), "")
+		}
+		
 	} else {
-		source = append(source, "", "", "")
+		source = append(source, "", "", "", "")
 	}
 	table.Append(source)
 
 	dest := []string{pp, "destination", t.Destination.IP}
 	if t.Destination.Internal != nil {
 		i := t.Destination.Internal
-		dest = append(dest, i.Namespace, labelsToString(i.NamespaceLabels), labelsToString(i.PodLabels))
+		if i.Workload != nil {
+			dest = append(dest, i.Namespace, labelsToString(i.NamespaceLabels), labelsToString(i.PodLabels), labelsToString(i.Workload))
+		} else {
+			dest = append(dest, i.Namespace, labelsToString(i.NamespaceLabels), labelsToString(i.PodLabels), "")
+		}
+		
 	} else {
-		dest = append(dest, "", "", "")
+		dest = append(dest, "", "", "", "")
 	}
 	table.Append(dest)
 
@@ -72,6 +83,7 @@ func (p *TrafficPeer) IsExternal() bool {
 }
 
 type InternalPeer struct {
+	Workload        map[string]string
 	PodLabels       map[string]string
 	NamespaceLabels map[string]string
 	Namespace       string
