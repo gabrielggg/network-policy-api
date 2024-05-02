@@ -225,44 +225,44 @@ func QueryTraffic(explainedPolicies *matcher.Policy, trafficPath string) {
 	allTraffics, err := json.ParseFile[[]*matcher.Traffic](trafficPath)
 	utils.DoOrDie(err)
 	for _, traffic := range *allTraffics {
-		if (traffic.Source.Internal == nil && traffic.Destination.Internal == nil){
+		if traffic.Source.Internal == nil && traffic.Destination.Internal == nil {
 			fmt.Printf("Traffic:\n%s\n", traffic.Table())
 			result := explainedPolicies.IsTrafficAllowed(traffic)
 			fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
-		} else if (traffic.Source.Internal == nil && traffic.Destination.Internal != nil) {
+		} else if traffic.Source.Internal == nil && traffic.Destination.Internal != nil {
 			if traffic.Destination.Internal.Workload != nil {
 				TrafficIterator(explainedPolicies, traffic.Destination, traffic)
 			} else {
 				fmt.Printf("Traffic:\n%s\n", traffic.Table())
 				result := explainedPolicies.IsTrafficAllowed(traffic)
 				fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
-			}			
-		} else if (traffic.Source.Internal != nil && traffic.Destination.Internal == nil) {
+			}
+		} else if traffic.Source.Internal != nil && traffic.Destination.Internal == nil {
 			if traffic.Source.Internal.Workload != nil {
 				TrafficIterator(explainedPolicies, traffic.Source, traffic)
 			} else {
 				fmt.Printf("Traffic:\n%s\n", traffic.Table())
 				result := explainedPolicies.IsTrafficAllowed(traffic)
 				fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
-			}			
+			}
 		} else {
 			if traffic.Source.Internal.Workload != nil && traffic.Destination.Internal.Workload != nil {
 				TrafficIterator(explainedPolicies, traffic.Source, traffic)
-			} else if traffic.Source.Internal.Workload != nil && traffic.Destination.Internal.Workload == nil{
+			} else if traffic.Source.Internal.Workload != nil && traffic.Destination.Internal.Workload == nil {
 				TrafficIterator(explainedPolicies, traffic.Source, traffic)
-			} else if traffic.Source.Internal.Workload == nil && traffic.Destination.Internal.Workload != nil{
+			} else if traffic.Source.Internal.Workload == nil && traffic.Destination.Internal.Workload != nil {
 				TrafficIterator(explainedPolicies, traffic.Destination, traffic)
 			} else {
 				fmt.Printf("Traffic:\n%s\n", traffic.Table())
 				result := explainedPolicies.IsTrafficAllowed(traffic)
 				fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
 			}
-		}		
-	}	
+		}
+	}
 }
 
-func TrafficIterator(explainedPolicies *matcher.Policy, trafficPeer *matcher.TrafficPeer, traffic *matcher.Traffic){
-	for k, v := range trafficPeer.Internal.Workload {    
+func TrafficIterator(explainedPolicies *matcher.Policy, trafficPeer *matcher.TrafficPeer, traffic *matcher.Traffic) {
+	for k, v := range trafficPeer.Internal.Workload {
 		args := &AnalyzeArgs{}
 		kubeClient, err := kube.NewKubernetesForContext(args.Context)
 		utils.DoOrDie(err)
@@ -275,24 +275,24 @@ func TrafficIterator(explainedPolicies *matcher.Policy, trafficPeer *matcher.Tra
 		if err != nil {
 			logrus.Errorf("unable to read pods from kube, ns '%s': %+v", "default", err)
 		}
-		for _,pod:= range kubePods{
+		for _, pod := range kubePods {
 			workloadOwner := ""
-			if k=="daemonset" || k=="statefulset" {
+			if k == "daemonset" || k == "statefulset" {
 				workloadOwner = pod.OwnerReferences[0].Name
 			} else {
 				kubeReplicaSets, err := kubeClient.GetReplicaSet(trafficPeer.Internal.Namespace, pod.OwnerReferences[0].Name)
 				if err != nil {
-				logrus.Errorf("unable to read Replicaset from kube, ns '%s': %+v", "default", err)
+					logrus.Errorf("unable to read Replicaset from kube, ns '%s': %+v", "default", err)
 				}
 				workloadOwner = kubeReplicaSets.OwnerReferences[0].Name
 			}
 			if workloadOwner == v {
-				trafficPeer.Internal.PodLabels = pod.Labels 
+				trafficPeer.Internal.PodLabels = pod.Labels
 				trafficPeer.Internal.NamespaceLabels = ns.Labels
 				trafficPeer.IP = pod.Status.PodIP
-				if (traffic.Source.Internal != nil && traffic.Destination.Internal != nil){
+				if traffic.Source.Internal != nil && traffic.Destination.Internal != nil {
 					if traffic.Source.Internal.Workload != nil && traffic.Destination.Internal.Workload != nil {
-						for k, v := range traffic.Destination.Internal.Workload {    
+						for k, v := range traffic.Destination.Internal.Workload {
 							args := &AnalyzeArgs{}
 							kubeClient, err := kube.NewKubernetesForContext(args.Context)
 							utils.DoOrDie(err)
@@ -305,27 +305,27 @@ func TrafficIterator(explainedPolicies *matcher.Policy, trafficPeer *matcher.Tra
 							if err != nil {
 								logrus.Errorf("unable to read pods from kube, ns '%s': %+v", "default", err)
 							}
-							for _,pod:= range kubePods{
+							for _, pod := range kubePods {
 								workloadOwner := ""
-								if k=="daemonset" || k=="statefulset" {
+								if k == "daemonset" || k == "statefulset" {
 									workloadOwner = pod.OwnerReferences[0].Name
 								} else {
 									kubeReplicaSets, err := kubeClient.GetReplicaSet(traffic.Destination.Internal.Namespace, pod.OwnerReferences[0].Name)
 									if err != nil {
-									logrus.Errorf("unable to read Replicaset from kube, ns '%s': %+v", "default", err)
+										logrus.Errorf("unable to read Replicaset from kube, ns '%s': %+v", "default", err)
 									}
 									workloadOwner = kubeReplicaSets.OwnerReferences[0].Name
 								}
 								if workloadOwner == v {
-									traffic.Destination.Internal.PodLabels = pod.Labels 
+									traffic.Destination.Internal.PodLabels = pod.Labels
 									traffic.Destination.Internal.NamespaceLabels = ns.Labels
 									traffic.Destination.IP = pod.Status.PodIP
 									fmt.Printf("Traffic:\n%s\n", traffic.Table())
 									result := explainedPolicies.IsTrafficAllowed(traffic)
 									fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
 								}
-								
-							}                                  
+
+							}
 						}
 					} else {
 						fmt.Printf("Traffic:\n%s\n", traffic.Table())
@@ -337,10 +337,10 @@ func TrafficIterator(explainedPolicies *matcher.Policy, trafficPeer *matcher.Tra
 					result := explainedPolicies.IsTrafficAllowed(traffic)
 					fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
 				}
-				
+
 			}
-			
-		}                                  
+
+		}
 	}
 }
 

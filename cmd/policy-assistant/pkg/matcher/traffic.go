@@ -37,7 +37,7 @@ func (t *Traffic) Table() string {
 		} else {
 			source = append(source, i.Namespace, labelsToString(i.NamespaceLabels), labelsToString(i.PodLabels), "")
 		}
-		
+
 	} else {
 		source = append(source, "", "", "", "")
 	}
@@ -51,7 +51,7 @@ func (t *Traffic) Table() string {
 		} else {
 			dest = append(dest, i.Namespace, labelsToString(i.NamespaceLabels), labelsToString(i.PodLabels), "")
 		}
-		
+
 	} else {
 		dest = append(dest, "", "", "", "")
 	}
