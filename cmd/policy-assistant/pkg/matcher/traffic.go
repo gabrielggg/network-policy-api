@@ -50,6 +50,29 @@ func (t *Traffic) Table() string {
 	return tableString.String()
 }
 
+func (t *Traffic) Translate() string {
+
+	pp := fmt.Sprintf("%d (%s) on %s", t.ResolvedPort, t.ResolvedPortName, t.Protocol)
+
+	source := []string{pp, "source", t.Source.IP}
+	if t.Source.Workload != nil {
+		i := t.Source.Workload
+		source = append(source, i.Namespace, labelsToString(i.NamespaceLabels), labelsToString(i.PodLabels))
+	} else {
+		source = append(source, "", "", "")
+	}
+
+	dest := []string{pp, "destination", t.Destination.IP}
+	if t.Destination.Workload != nil {
+		i := t.Destination.Workload
+		dest = append(dest, i.Namespace, labelsToString(i.NamespaceLabels), labelsToString(i.PodLabels))
+	} else {
+		dest = append(dest, "", "", "")
+	}
+	
+	return tableString.String()
+}
+
 func labelsToString(labels map[string]string) string {
 	format := func(k string) string { return fmt.Sprintf("%s: %s", k, labels[k]) }
 	return strings.Join(slice.Map(format, slice.Sort(maps.Keys(labels))), "\n")
@@ -70,6 +93,17 @@ func (p *TrafficPeer) Namespace() string {
 func (p *TrafficPeer) IsExternal() bool {
 	return p.Internal == nil
 }
+
+func (p *TrafficPeer) HasWorkload() bool {
+	return p.Workload != nil
+}
+
+func (p *TrafficPeer) Translate() string {
+	fmt.Printf(p.Workload.fullName)
+	fmt.Printf(p.Internal)
+}
+
+
 
 //type InternalPeer struct {
 //	PodLabels       map[string]string
