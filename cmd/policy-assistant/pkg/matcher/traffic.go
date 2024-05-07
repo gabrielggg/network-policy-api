@@ -55,10 +55,10 @@ func labelsToString(labels map[string]string) string {
 	return strings.Join(slice.Map(format, slice.Sort(maps.Keys(labels))), "\n")
 }
 
-type TrafficPeer struct {
-	Internal *InternalPeer
-	IP       string
-}
+//type TrafficPeer struct {
+//	Internal *InternalPeer
+//	IP       string
+//}
 
 func (p *TrafficPeer) Namespace() string {
 	if p.Internal == nil {
@@ -71,10 +71,40 @@ func (p *TrafficPeer) IsExternal() bool {
 	return p.Internal == nil
 }
 
+//type InternalPeer struct {
+//	PodLabels       map[string]string
+//	NamespaceLabels map[string]string
+//	Namespace       string
+//	NodeLabels      map[string]string
+//	Node            string
+//}
+
+//////////
+
+type TrafficPeer struct {
+	Internal *InternalPeer
+       // keep this field for backwards-compatibility or for IPs without internalPeer
+	IP          string
+       // use this for pod IPs
+       *Workload
+}
+
 type InternalPeer struct {
 	PodLabels       map[string]string
 	NamespaceLabels map[string]string
 	Namespace       string
-	NodeLabels      map[string]string
-	Node            string
+       // I believe I added these node pieces. We can remove
+}
+
+type Workload struct {
+      // format: namespace/kind/name
+      	fullName string
+	pods []PodNetworking
+}
+
+type PodNetworking struct {
+       IP string
+      // don't worry about populating below fields right now
+       IsHostNetworking bool
+       NodeLabels []string
 }
