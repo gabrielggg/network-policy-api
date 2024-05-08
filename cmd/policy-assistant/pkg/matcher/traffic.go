@@ -75,7 +75,7 @@ func (p *TrafficPeer) HasWorkload() bool {
 	return p.Workload != nil
 }
 
-func (p *TrafficPeer) Translate() string {
+func (p *TrafficPeer) Translate() TrafficPeer {
 	fmt.Printf(p.Workload.fullName)
 	fmt.Printf(p.Internal)
 	InternalPeer := InternalPeer{
@@ -83,7 +83,13 @@ func (p *TrafficPeer) Translate() string {
                 NamespaceLabels: nil,
                 Namespace: "tmpns",
         }
-        *p.Internal = InternalPeer
+	TranslatedPeer := TrafficPeer{
+		Internal: InternalPeer
+	        // keep this field for backwards-compatibility or for IPs without internalPeer
+		IP: nill
+	        // use this for pod IPs
+	        Workload: //llenar toda la data de los pods asociados al workload
+        }
 }
 
 
