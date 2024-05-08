@@ -83,12 +83,18 @@ func (p *TrafficPeer) Translate() TrafficPeer {
                 NamespaceLabels: nil,
                 Namespace: "tmpns",
         }
+
+	Workload := Workload{
+                fullName : p.Workload.fullName,
+                pods : //generar data para pods
+        }
+	
 	TranslatedPeer := TrafficPeer{
 		Internal: InternalPeer
 	        // keep this field for backwards-compatibility or for IPs without internalPeer
 		IP: nill
 	        // use this for pod IPs
-	        Workload: //llenar toda la data de los pods asociados al workload
+	        Workload: Workload
         }
 }
 
