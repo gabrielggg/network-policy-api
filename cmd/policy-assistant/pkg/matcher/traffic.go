@@ -109,6 +109,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	        // use this for pod IPs
 	        Workload: Workload
         }
+	return TranslatedPeer
 }
 
 
