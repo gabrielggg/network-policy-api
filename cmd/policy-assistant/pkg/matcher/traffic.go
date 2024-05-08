@@ -93,9 +93,9 @@ func (p *TrafficPeer) Translate() TrafficPeer {
         }
 	//esta es la idea
 	//podsNetworking.append(podNetworking)
-
+	//iterar sobre esto para popular la lista dependiendo de la cantidad de pods del workload
 	var podsNetworking []PodNetworking
-	podsNetworking.append(podNetworking)
+	podsNetworking = append(podsNetworking, podNetworking)
 
 	Workload := Workload{
                 fullName : p.Workload.fullName,
