@@ -92,6 +92,9 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	        NodeLabels: nil
         }
 	//esta es la idea
+	//podsNetworking.append(podNetworking)
+
+	var podsNetworking []PodNetworking
 	podsNetworking.append(podNetworking)
 
 	Workload := Workload{
