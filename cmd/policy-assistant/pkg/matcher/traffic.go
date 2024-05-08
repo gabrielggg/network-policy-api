@@ -84,6 +84,16 @@ func (p *TrafficPeer) Translate() TrafficPeer {
                 Namespace: "tmpns",
         }
 
+	//crear una lista de estos objectos
+	podNetworking := PodNetworking{
+                IP: //extract ip from pod
+	      	// don't worry about populating below fields right now
+	        IsHostNetworking: nil
+	        NodeLabels: nil
+        }
+	//esta es la idea
+	podsNetworking.append(podNetworking)
+
 	Workload := Workload{
                 fullName : p.Workload.fullName,
                 pods : //generar data para pods
@@ -92,7 +102,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	TranslatedPeer := TrafficPeer{
 		Internal: InternalPeer
 	        // keep this field for backwards-compatibility or for IPs without internalPeer
-		IP: nill
+		IP: nil
 	        // use this for pod IPs
 	        Workload: Workload
         }
