@@ -7,6 +7,8 @@ import (
 	"github.com/mattfenwick/collections/pkg/slice"
 	"github.com/olekukonko/tablewriter"
 	"github.com/mattfenwick/cyclonus/pkg/kube"
+	"github.com/mattfenwick/cyclonus/pkg/utils"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/exp/maps"
 	v1 "k8s.io/api/core/v1"
 )
