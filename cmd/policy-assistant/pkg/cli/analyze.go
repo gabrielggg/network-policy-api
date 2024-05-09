@@ -224,7 +224,7 @@ func QueryTraffic(explainedPolicies *matcher.Policy, trafficPath string) {
 	utils.DoOrDie(err)
 
 	for _, traffic := range *allTraffics {
-		tmppr := json.Parse(traffic.Source.Translate())
+		tmppr := json.Parse[[]*matcher.TrafficPeer](traffic.Source.Translate())
 		fmt.Println(tmppr)
 		
 		fmt.Printf("Traffic:\n%s\n", traffic.Table())
