@@ -120,11 +120,11 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 		PodLabels: podLabels,
 		NamespaceLabels: namespaceLabels,
 		Namespace: workloadMetadata[0],
-		Pods: podsNetworking,
+		Pods: *podsNetworking,
 	}
 		
 	TranslatedPeer := TrafficPeer{
-		Internal: InternalPeer,
+		Internal: *InternalPeer,
         }
 	return TranslatedPeer
 }
