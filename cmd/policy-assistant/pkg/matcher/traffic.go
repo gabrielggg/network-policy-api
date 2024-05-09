@@ -124,7 +124,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	}
 		
 	TranslatedPeer := TrafficPeer{
-		Internal: InternalPeer,
+		Internal: *InternalPeer,
         }
 	return TranslatedPeer
 }
