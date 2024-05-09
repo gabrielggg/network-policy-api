@@ -120,7 +120,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 		
 	TranslatedPeer := TrafficPeer{
 		Internal: &InternalPeer,
-		IP: nil,
+		IP: "",
         }
 	return TranslatedPeer
 }
