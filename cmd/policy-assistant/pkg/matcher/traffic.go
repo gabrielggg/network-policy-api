@@ -75,9 +75,6 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	var podLabels map[string]string
 	var namespaceLabels map[string]string
 	workloadMetadata := strings.Split(p.Internal.Workload, "/")
-	fmt.Printf(workloadMetadata[0])
-	fmt.Printf(workloadMetadata[1])
-	fmt.Printf(workloadMetadata[2])
 	kubeClient, err := kube.NewKubernetesForContext("")
 	utils.DoOrDie(err)
 	if err != nil {
