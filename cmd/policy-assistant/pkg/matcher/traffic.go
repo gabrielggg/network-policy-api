@@ -104,7 +104,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 		if workloadOwner == workloadMetadata[2] {
 			podLabels = pod.Labels
 			namespaceLabels = ns.Labels
-			podNetworking := PodNetworking{
+			podNetworking := &PodNetworking{
 		                IP: pod.Status.PodIP,
 		        }
 			podsNetworking = append(podsNetworking, podNetworking)
@@ -120,7 +120,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 		PodLabels: podLabels,
 		NamespaceLabels: namespaceLabels,
 		Namespace: workloadMetadata[0],
-		Pods: &podsNetworking,
+		Pods: podsNetworking,
 	}
 		
 	TranslatedPeer := TrafficPeer{
