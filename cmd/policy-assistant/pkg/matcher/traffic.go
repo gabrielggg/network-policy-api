@@ -78,11 +78,6 @@ func (p *TrafficPeer) HasWorkload() bool {
 func (p *TrafficPeer) Translate() TrafficPeer {
 	fmt.Printf(p.Workload.fullName)
 	fmt.Printf(p.Internal)
-	InternalPeer := InternalPeer{
-                PodLabels: nil,
-                NamespaceLabels: nil,
-                Namespace: "tmpns",
-        }
 
 	//crear una lista de estos objectos
 	podNetworking := PodNetworking{
@@ -97,17 +92,22 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	var podsNetworking []PodNetworking
 	podsNetworking = append(podsNetworking, podNetworking)
 
-	Workload := Workload{
-                fullName : p.Workload.fullName,
-                pods : //generar data para pods
+	
+	InternalPeer := InternalPeer{
+		Workload: p.Internal.Workload,
+                PodLabels: nil,
+                NamespaceLabels: nil,
+                Namespace: "tmpns",
+		Pods: //generar data para pods lista de tipo podNetworking
         }
+
+	
+
 	
 	TranslatedPeer := TrafficPeer{
 		Internal: InternalPeer
 	        // keep this field for backwards-compatibility or for IPs without internalPeer
 		IP: nil
-	        // use this for pod IPs
-	        Workload: Workload
         }
 	return TranslatedPeer
 }
@@ -126,23 +126,20 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 
 type TrafficPeer struct {
 	Internal *InternalPeer
-       // keep this field for backwards-compatibility or for IPs without internalPeer
+        // IP external to cluster
 	IP          string
-       // use this for pod IPs
-       *Workload
 }
 
+// Internal to cluster
 type InternalPeer struct {
+        // optional: if set, will override remaining values with information from cluster
+        Workload string
+
 	PodLabels       map[string]string
 	NamespaceLabels map[string]string
 	Namespace       string
-       // I believe I added these node pieces. We can remove
-}
-
-type Workload struct {
-      // format: namespace/kind/name
-      	fullName string
-	pods []PodNetworking
+        // optional
+        Pods      []*PodNetworking
 }
 
 type PodNetworking struct {
