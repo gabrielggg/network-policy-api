@@ -229,10 +229,7 @@ func QueryTraffic(explainedPolicies *matcher.Policy, trafficPath string) {
 		  fmt.Println(err)
 		  return
 	        }
-	        fmt.Println(string(b))
-		//tmppr,_ := json.Parse[[]*matcher.TrafficPeer](traffic.Source.Translate())
-		//fmt.Println(tmppr)
-		
+	        fmt.Println(string(b))		
 		fmt.Printf("Traffic:\n%s\n", traffic.Table())
 
 		result := explainedPolicies.IsTrafficAllowed(traffic)
