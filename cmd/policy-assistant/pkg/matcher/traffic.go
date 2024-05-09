@@ -111,8 +111,8 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 			podLabels := pod.Labels
 			namespaceLabels = ns.Labels
 			podNetworking := PodNetworking{
-		                IP: pod.Status.PodIP
-			        IsHostNetworking: nil
+		                IP: pod.Status.PodIP,
+			        IsHostNetworking: nil,
 			        NodeLabels: nil
 		        }
 			podsNetworking = append(podsNetworking, podNetworking)
