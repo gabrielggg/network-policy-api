@@ -12,5 +12,5 @@
       "Protocol": "TCP",
       "ResolvedPort": 80,
       "ResolvedPortName": "serve-80-tcp"
-    },    
+    }   
 ]
