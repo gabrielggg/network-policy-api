@@ -85,13 +85,6 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	fmt.Printf(p.Internal.Workload)
 	workloadMetadata := strings.Split(p.Internal.Workload, "/")
 	fmt.Printf(workloadMetadata[0])
-
-
-
-	
-	
-
-	
 	kubeClient, err := kube.NewKubernetesForContext("")
 	utils.DoOrDie(err)
 	if err != nil {
@@ -101,7 +94,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	utils.DoOrDie(err)
 	kubePods, err := kube.GetPodsInNamespaces(kubeClient, []string{workloadMetadata[0]})
 	if err != nil {
-		logrus.Errorf("unable to read pods from kube, ns '%s': %+v", "default", err)
+		logrus.Errorf("unable to read pods from kube, ns '%s': %+v", workloadMetadata[0], err)
 	}
 	for _, pod := range kubePods {
 		workloadOwner := ""
@@ -110,7 +103,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 		} else {
 			kubeReplicaSets, err := kubeClient.GetReplicaSet(workloadMetadata[0], pod.OwnerReferences[0].Name)
 			if err != nil {
-				logrus.Errorf("unable to read Replicaset from kube, ns '%s': %+v", "default", err)
+				logrus.Errorf("unable to read Replicaset from kube, rs '%s': %+v", pod.OwnerReferences[0].Name, err)
 			}
 			workloadOwner = kubeReplicaSets.OwnerReferences[0].Name
 		}
