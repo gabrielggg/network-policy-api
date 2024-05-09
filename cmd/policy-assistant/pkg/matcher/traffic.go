@@ -105,7 +105,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 			workloadOwner = kubeReplicaSets.OwnerReferences[0].Name
 		}
 		if workloadOwner == workloadMetadata[2] {
-			podLabels := pod.Labels
+			podLabels = pod.Labels
 			namespaceLabels = ns.Labels
 			podNetworking := PodNetworking{
 		                IP: pod.Status.PodIP,
@@ -128,7 +128,6 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 		
 	TranslatedPeer := TrafficPeer{
 		Internal: InternalPeer,
-		IP: nil,
         }
 	return TranslatedPeer
 }
