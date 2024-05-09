@@ -71,14 +71,13 @@ func (p *TrafficPeer) IsExternal() bool {
 
 
 func (p *TrafficPeer) Translate() TrafficPeer {
-
 	var podsNetworking []*PodNetworking
 	var podLabels map[string]string
 	var namespaceLabels map[string]string
-	
-	fmt.Printf(p.Internal.Workload)
 	workloadMetadata := strings.Split(p.Internal.Workload, "/")
 	fmt.Printf(workloadMetadata[0])
+	fmt.Printf(workloadMetadata[1])
+	fmt.Printf(workloadMetadata[2])
 	kubeClient, err := kube.NewKubernetesForContext("")
 	utils.DoOrDie(err)
 	if err != nil {
@@ -110,9 +109,8 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 			podsNetworking = append(podsNetworking, &podNetworking)
 			
 		} else {
-			
+			fmt.Println("pod not identified")
 		}
-		
 	}
 
 	InternalPeer := InternalPeer{
