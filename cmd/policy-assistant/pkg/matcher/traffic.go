@@ -107,7 +107,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 			podNetworking := PodNetworking{
 		                IP: pod.Status.PodIP,
 		        }
-			*podsNetworking = append(podsNetworking, podNetworking)
+			podsNetworking = append(podsNetworking, podNetworking)
 			
 		} else {
 			
@@ -115,7 +115,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 		
 	}
 
-	*InternalPeer := InternalPeer{
+	InternalPeer := InternalPeer{
 		Workload: p.Internal.Workload,
 		PodLabels: podLabels,
 		NamespaceLabels: namespaceLabels,
