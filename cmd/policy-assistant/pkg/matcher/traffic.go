@@ -72,9 +72,6 @@ func (p *TrafficPeer) IsExternal() bool {
 	return p.Internal == nil
 }
 
-func (p *TrafficPeer) HasWorkload() bool {
-	return p.Internal.Workload != nil
-}
 
 func (p *TrafficPeer) Translate() TrafficPeer {
 
@@ -112,8 +109,6 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 			namespaceLabels = ns.Labels
 			podNetworking := PodNetworking{
 		                IP: pod.Status.PodIP,
-			        IsHostNetworking: nil,
-			        NodeLabels: nil,
 		        }
 			podsNetworking = append(podsNetworking, podNetworking)
 			
