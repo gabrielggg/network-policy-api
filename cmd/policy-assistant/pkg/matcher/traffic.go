@@ -58,11 +58,6 @@ func labelsToString(labels map[string]string) string {
 	return strings.Join(slice.Map(format, slice.Sort(maps.Keys(labels))), "\n")
 }
 
-//type TrafficPeer struct {
-//	Internal *InternalPeer
-//	IP       string
-//}
-
 func (p *TrafficPeer) Namespace() string {
 	if p.Internal == nil {
 		return ""
@@ -112,7 +107,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 			podNetworking := PodNetworking{
 		                IP: pod.Status.PodIP,
 		        }
-			podsNetworking = append(podsNetworking, podNetworking)
+			*podsNetworking = append(podsNetworking, podNetworking)
 			
 		} else {
 			
@@ -120,7 +115,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 		
 	}
 
-	InternalPeer := InternalPeer{
+	*InternalPeer := InternalPeer{
 		Workload: p.Internal.Workload,
 		PodLabels: podLabels,
 		NamespaceLabels: namespaceLabels,
@@ -133,18 +128,6 @@ func (p *TrafficPeer) Translate() TrafficPeer {
         }
 	return TranslatedPeer
 }
-
-
-
-//type InternalPeer struct {
-//	PodLabels       map[string]string
-//	NamespaceLabels map[string]string
-//	Namespace       string
-//	NodeLabels      map[string]string
-//	Node            string
-//}
-
-//////////
 
 type TrafficPeer struct {
 	Internal *InternalPeer
