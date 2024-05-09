@@ -139,8 +139,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	}
 		
 	TranslatedPeer := TrafficPeer{
-		Internal: InternalPeer
-	        // keep this field for backwards-compatibility or for IPs without internalPeer
+		Internal: InternalPeer,
 		IP: nil
         }
 	return TranslatedPeer
