@@ -6,6 +6,7 @@ import (
 
 	"github.com/mattfenwick/collections/pkg/slice"
 	"github.com/olekukonko/tablewriter"
+	"github.com/mattfenwick/cyclonus/pkg/kube"
 	"golang.org/x/exp/maps"
 	v1 "k8s.io/api/core/v1"
 )
@@ -76,7 +77,6 @@ func (p *TrafficPeer) HasWorkload() bool {
 }
 
 func (p *TrafficPeer) Translate() TrafficPeer {
-	fmt.Printf(p.Workload.fullName)
 	fmt.Printf(p.Internal)
 
 	//crear una lista de estos objectos
@@ -92,6 +92,35 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	var podsNetworking []PodNetworking
 	podsNetworking = append(podsNetworking, podNetworking)
 
+	
+	kubeClient, err := kube.NewKubernetesForContext("")
+	utils.DoOrDie(err)
+	if err != nil {
+		logrus.Errorf("unable to read ReplicaSet from kube, ns '%s': %+v", "default", err)
+	}
+	ns, err := kubeClient.GetNamespace(p.Internal.Namespace)
+	utils.DoOrDie(err)
+	kubePods, err := kube.GetPodsInNamespaces(kubeClient, []string{p.Internal.Namespace})
+	if err != nil {
+		logrus.Errorf("unable to read pods from kube, ns '%s': %+v", "default", err)
+	}
+	for _, pod := range kubePods {
+		workloadOwner := ""
+		if k == "daemonset" || k == "statefulset" {
+			workloadOwner = pod.OwnerReferences[0].Name
+		} else {
+			kubeReplicaSets, err := kubeClient.GetReplicaSet(trafficPeer.Internal.Namespace, pod.OwnerReferences[0].Name)
+			if err != nil {
+				logrus.Errorf("unable to read Replicaset from kube, ns '%s': %+v", "default", err)
+			}
+			workloadOwner = kubeReplicaSets.OwnerReferences[0].Name
+		}
+		if workloadOwner == v {
+			trafficPeer.Internal.PodLabels = pod.Labels
+			trafficPeer.Internal.NamespaceLabels = ns.Labels
+			trafficPeer.IP = pod.Status.PodIP
+		}
+	}
 	
 	InternalPeer := InternalPeer{
 		Workload: p.Internal.Workload,
