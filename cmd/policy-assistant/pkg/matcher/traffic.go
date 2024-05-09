@@ -73,7 +73,7 @@ func (p *TrafficPeer) IsExternal() bool {
 }
 
 func (p *TrafficPeer) HasWorkload() bool {
-	return p.Workload != nil
+	return p.Internal.Workload != nil
 }
 
 func (p *TrafficPeer) Translate() TrafficPeer {
