@@ -224,6 +224,7 @@ func QueryTraffic(explainedPolicies *matcher.Policy, trafficPath string) {
 	utils.DoOrDie(err)
 
 	for _, traffic := range *allTraffics {
+		testpr := traffic.Translate()
 		fmt.Printf("Traffic:\n%s\n", traffic.Table())
 
 		result := explainedPolicies.IsTrafficAllowed(traffic)
