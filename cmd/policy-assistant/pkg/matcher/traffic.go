@@ -77,20 +77,19 @@ func (p *TrafficPeer) HasWorkload() bool {
 }
 
 func (p *TrafficPeer) Translate() TrafficPeer {
-	fmt.Printf(p.Internal.Workload)
 
-	//crear una lista de estos objectos
-	podNetworking := PodNetworking{
-                IP: //extract ip from pod
-	      	// don't worry about populating below fields right now
-	        IsHostNetworking: nil
-	        NodeLabels: nil
-        }
-	//esta es la idea
-	//podsNetworking.append(podNetworking)
-	//iterar sobre esto para popular la lista dependiendo de la cantidad de pods del workload
 	var podsNetworking []PodNetworking
-	podsNetworking = append(podsNetworking, podNetworking)
+	var podLabels map[string]string
+	var namespaceLabels map[string]string
+	
+	fmt.Printf(p.Internal.Workload)
+	workloadMetadata := strings.Split(p.Internal.Workload, "/")
+	fmt.Printf(workloadMetadata[0])
+
+
+
+	
+	
 
 	
 	kubeClient, err := kube.NewKubernetesForContext("")
@@ -98,41 +97,47 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	if err != nil {
 		logrus.Errorf("unable to read ReplicaSet from kube, ns '%s': %+v", "default", err)
 	}
-	ns, err := kubeClient.GetNamespace(p.Internal.Namespace)
+	ns, err := kubeClient.GetNamespace(workloadMetadata[0])
 	utils.DoOrDie(err)
-	kubePods, err := kube.GetPodsInNamespaces(kubeClient, []string{p.Internal.Namespace})
+	kubePods, err := kube.GetPodsInNamespaces(kubeClient, []string{workloadMetadata[0]})
 	if err != nil {
 		logrus.Errorf("unable to read pods from kube, ns '%s': %+v", "default", err)
 	}
 	for _, pod := range kubePods {
 		workloadOwner := ""
-		if k == "daemonset" || k == "statefulset" {
+		if workloadMetadata[1] == "daemonset" || workloadMetadata[1] == "statefulset" {
 			workloadOwner = pod.OwnerReferences[0].Name
 		} else {
-			kubeReplicaSets, err := kubeClient.GetReplicaSet(trafficPeer.Internal.Namespace, pod.OwnerReferences[0].Name)
+			kubeReplicaSets, err := kubeClient.GetReplicaSet(workloadMetadata[0], pod.OwnerReferences[0].Name)
 			if err != nil {
 				logrus.Errorf("unable to read Replicaset from kube, ns '%s': %+v", "default", err)
 			}
 			workloadOwner = kubeReplicaSets.OwnerReferences[0].Name
 		}
-		if workloadOwner == v {
-			trafficPeer.Internal.PodLabels = pod.Labels
-			trafficPeer.Internal.NamespaceLabels = ns.Labels
-			trafficPeer.IP = pod.Status.PodIP
+		if workloadOwner == workloadMetadata[2] {
+			podLabels := pod.Labels
+			namespaceLabels = ns.Labels
+			podNetworking := PodNetworking{
+		                IP: pod.Status.PodIP
+			        IsHostNetworking: nil
+			        NodeLabels: nil
+		        }
+			podsNetworking = append(podsNetworking, podNetworking)
+			
+		} else {
+			
 		}
+		
 	}
-	
+
 	InternalPeer := InternalPeer{
 		Workload: p.Internal.Workload,
-                PodLabels: nil,
-                NamespaceLabels: nil,
-                Namespace: "tmpns",
-		Pods: //generar data para pods lista de tipo podNetworking
-        }
-
-	
-
-	
+		PodLabels: podLabels,
+		NamespaceLabels: namespaceLabels,
+		Namespace: workloadMetadata[0],
+		Pods: podsNetworking
+	}
+		
 	TranslatedPeer := TrafficPeer{
 		Internal: InternalPeer
 	        // keep this field for backwards-compatibility or for IPs without internalPeer
