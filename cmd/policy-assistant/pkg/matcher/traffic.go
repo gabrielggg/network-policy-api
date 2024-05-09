@@ -72,7 +72,7 @@ func (p *TrafficPeer) IsExternal() bool {
 
 func (p *TrafficPeer) Translate() TrafficPeer {
 
-	var podsNetworking []PodNetworking
+	var podsNetworking []*PodNetworking
 	var podLabels map[string]string
 	var namespaceLabels map[string]string
 	
@@ -107,7 +107,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 			podNetworking := PodNetworking{
 		                IP: pod.Status.PodIP,
 		        }
-			podsNetworking = append(podsNetworking, &podNetworking)
+			podsNetworking = append(podsNetworking, podNetworking)
 			
 		} else {
 			
