@@ -113,7 +113,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 			podNetworking := PodNetworking{
 		                IP: pod.Status.PodIP,
 			        IsHostNetworking: nil,
-			        NodeLabels: nil
+			        NodeLabels: nil,
 		        }
 			podsNetworking = append(podsNetworking, podNetworking)
 			
@@ -128,12 +128,12 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 		PodLabels: podLabels,
 		NamespaceLabels: namespaceLabels,
 		Namespace: workloadMetadata[0],
-		Pods: podsNetworking
+		Pods: podsNetworking,
 	}
 		
 	TranslatedPeer := TrafficPeer{
 		Internal: InternalPeer,
-		IP: nil
+		IP: nil,
         }
 	return TranslatedPeer
 }
