@@ -77,7 +77,7 @@ func (p *TrafficPeer) HasWorkload() bool {
 }
 
 func (p *TrafficPeer) Translate() TrafficPeer {
-	fmt.Printf(p.Internal)
+	fmt.Printf(p.Internal.Workload)
 
 	//crear una lista de estos objectos
 	podNetworking := PodNetworking{
