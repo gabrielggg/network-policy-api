@@ -1,0 +1,17 @@
+[
+    {
+      "Source": {
+        "Internal": {
+            "Workload": "default/deployment/nginx-deployment2"
+          }
+        
+      },
+      "Destination": {
+        "IP": "8.8.8.8"
+      },
+      "Protocol": "TCP",
+      "ResolvedPort": 80,
+      "ResolvedPortName": "serve-80-tcp"
+    },
+    
+  ]
