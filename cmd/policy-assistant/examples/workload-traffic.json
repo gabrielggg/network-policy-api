@@ -2,7 +2,7 @@
     {
       "Source": {
         "Internal": {
-            "Workload": "kube-system/daemonsEt/fluentd-elasticsearch"
+            "Workload": "kube-system/daemonset/fluentd-elasticsearchs"
           }
         
       },

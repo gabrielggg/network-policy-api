@@ -79,7 +79,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	var podsNetworking []*PodNetworking
 	var podLabels map[string]string
 	var namespaceLabels map[string]string
-	workloadOwner := ""
+	var workloadOwner string
 	workloadOwnerExists := false
 	workloadMetadata := strings.Split(strings.ToLower(p.Internal.Workload), "/")
 	if len(workloadMetadata) != 3 || (workloadMetadata[1] != "daemonset" && workloadMetadata[1] != "statefulset" && workloadMetadata[1] != "replicaset" && workloadMetadata[1] != "deployment" && workloadMetadata[1] != "pod") {
