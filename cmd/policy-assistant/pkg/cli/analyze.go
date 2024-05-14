@@ -225,11 +225,11 @@ func QueryTraffic(explainedPolicies *matcher.Policy, trafficPath string) {
 
 	for _, traffic := range *allTraffics {
 		b, err := json.Marshal(traffic.Source.Translate())
-	        if err != nil {
-		  fmt.Println(err)
-		  return
-	        }
-	        fmt.Println(string(b))		
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println(string(b))
 		fmt.Printf("Traffic:\n%s\n", traffic.Table())
 
 		result := explainedPolicies.IsTrafficAllowed(traffic)

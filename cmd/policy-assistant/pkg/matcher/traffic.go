@@ -78,9 +78,11 @@ func (p *TrafficPeer) IsExternal() bool {
 func (p *TrafficPeer) Translate() TrafficPeer {
 	var podsNetworking []*PodNetworking
 	var podLabels map[string]string
-	var namespaceLabels map[string]string	
+	var namespaceLabels map[string]string
+	workloadOwner := ""
+	workloadOwnerExists := false
 	workloadMetadata := strings.Split(strings.ToLower(p.Internal.Workload), "/")
-	if len(workloadMetadata) != 3 || (workloadMetadata[1] != "daemonset" && workloadMetadata[1] != "statefulset" && workloadMetadata[1] != "replicaset" && workloadMetadata[1] != "deployment" && workloadMetadata[1] != "pod")  {
+	if len(workloadMetadata) != 3 || (workloadMetadata[1] != "daemonset" && workloadMetadata[1] != "statefulset" && workloadMetadata[1] != "replicaset" && workloadMetadata[1] != "deployment" && workloadMetadata[1] != "pod") {
 		logrus.Fatalf("Bad Workload structure: Types supported are pod, replicaset, deployment, daemonset, statefulset, and 3 fields are required with this structure, <namespace>/<workloadType>/<workloadName>")
 	}
 	kubeClient, err := kube.NewKubernetesForContext("")
@@ -92,7 +94,6 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 		logrus.Fatalf("unable to read pods from kube, ns '%s': %+v", workloadMetadata[0], err)
 	}
 	for _, pod := range kubePods {
-		workloadOwner := ""
 		if workloadMetadata[1] == "daemonset" || workloadMetadata[1] == "statefulset" || workloadMetadata[1] == "replicaset" {
 			workloadOwner = pod.OwnerReferences[0].Name
 		} else if workloadMetadata[1] == "deployment" {
@@ -101,7 +102,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 				logrus.Fatalf("unable to read Replicaset from kube, rs '%s': %+v", pod.OwnerReferences[0].Name, err)
 			}
 			workloadOwner = kubeReplicaSets.OwnerReferences[0].Name
-		} else {
+		} else if workloadMetadata[1] == "pod" {
 			workloadOwner = pod.Name
 		}
 		if workloadOwner == workloadMetadata[2] {
@@ -111,8 +112,13 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 				IP: pod.Status.PodIP,
 			}
 			podsNetworking = append(podsNetworking, &podNetworking)
+			workloadOwnerExists = true
 
 		}
+	}
+
+	if !workloadOwnerExists {
+		logrus.Fatalf("workload not found on the cluster")
 	}
 
 	InternalPeer := InternalPeer{
@@ -132,7 +138,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 // Internal to cluster
 type InternalPeer struct {
 	// optional: if set, will override remaining values with information from cluster
-	Workload string
+	Workload        string
 	PodLabels       map[string]string
 	NamespaceLabels map[string]string
 	Namespace       string
