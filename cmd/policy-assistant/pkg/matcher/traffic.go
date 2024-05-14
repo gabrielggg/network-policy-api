@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/mattfenwick/collections/pkg/slice"
-	"github.com/olekukonko/tablewriter"
 	"github.com/mattfenwick/cyclonus/pkg/kube"
 	"github.com/mattfenwick/cyclonus/pkg/utils"
+	"github.com/olekukonko/tablewriter"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/exp/maps"
 	v1 "k8s.io/api/core/v1"
@@ -58,6 +58,12 @@ func labelsToString(labels map[string]string) string {
 	return strings.Join(slice.Map(format, slice.Sort(maps.Keys(labels))), "\n")
 }
 
+type TrafficPeer struct {
+	Internal *InternalPeer
+	// IP external to cluster
+	IP string
+}
+
 func (p *TrafficPeer) Namespace() string {
 	if p.Internal == nil {
 		return ""
@@ -69,82 +75,74 @@ func (p *TrafficPeer) IsExternal() bool {
 	return p.Internal == nil
 }
 
-
 func (p *TrafficPeer) Translate() TrafficPeer {
 	var podsNetworking []*PodNetworking
 	var podLabels map[string]string
-	var namespaceLabels map[string]string
-	workloadMetadata := strings.Split(p.Internal.Workload, "/")
+	var namespaceLabels map[string]string	
+	workloadMetadata := strings.Split(strings.ToLower(p.Internal.Workload), "/")
+	if len(workloadMetadata) != 3 || (workloadMetadata[1] != "daemonset" && workloadMetadata[1] != "statefulset" && workloadMetadata[1] != "replicaset" && workloadMetadata[1] != "deployment" && workloadMetadata[1] != "pod")  {
+		logrus.Fatalf("Bad Workload structure: Types supported are pod, replicaset, deployment, daemonset, statefulset, and 3 fields are required with this structure, <namespace>/<workloadType>/<workloadName>")
+	}
 	kubeClient, err := kube.NewKubernetesForContext("")
 	utils.DoOrDie(err)
-	if err != nil {
-		logrus.Errorf("unable to read ReplicaSet from kube, ns '%s': %+v", "default", err)
-	}
 	ns, err := kubeClient.GetNamespace(workloadMetadata[0])
 	utils.DoOrDie(err)
 	kubePods, err := kube.GetPodsInNamespaces(kubeClient, []string{workloadMetadata[0]})
 	if err != nil {
-		logrus.Errorf("unable to read pods from kube, ns '%s': %+v", workloadMetadata[0], err)
+		logrus.Fatalf("unable to read pods from kube, ns '%s': %+v", workloadMetadata[0], err)
 	}
 	for _, pod := range kubePods {
 		workloadOwner := ""
-		if workloadMetadata[1] == "daemonset" || workloadMetadata[1] == "statefulset" {
+		if workloadMetadata[1] == "daemonset" || workloadMetadata[1] == "statefulset" || workloadMetadata[1] == "replicaset" {
 			workloadOwner = pod.OwnerReferences[0].Name
-		} else {
+		} else if workloadMetadata[1] == "deployment" {
 			kubeReplicaSets, err := kubeClient.GetReplicaSet(workloadMetadata[0], pod.OwnerReferences[0].Name)
 			if err != nil {
-				logrus.Errorf("unable to read Replicaset from kube, rs '%s': %+v", pod.OwnerReferences[0].Name, err)
+				logrus.Fatalf("unable to read Replicaset from kube, rs '%s': %+v", pod.OwnerReferences[0].Name, err)
 			}
 			workloadOwner = kubeReplicaSets.OwnerReferences[0].Name
+		} else {
+			workloadOwner = pod.Name
 		}
 		if workloadOwner == workloadMetadata[2] {
 			podLabels = pod.Labels
 			namespaceLabels = ns.Labels
 			podNetworking := PodNetworking{
-		                IP: pod.Status.PodIP,
-		        }
+				IP: pod.Status.PodIP,
+			}
 			podsNetworking = append(podsNetworking, &podNetworking)
-			
-		} else {
-			fmt.Println("pod not identified")
+
 		}
 	}
 
 	InternalPeer := InternalPeer{
-		Workload: p.Internal.Workload,
-		PodLabels: podLabels,
+		Workload:        p.Internal.Workload,
+		PodLabels:       podLabels,
 		NamespaceLabels: namespaceLabels,
-		Namespace: workloadMetadata[0],
-		Pods: podsNetworking,
+		Namespace:       workloadMetadata[0],
+		Pods:            podsNetworking,
 	}
-		
+
 	TranslatedPeer := TrafficPeer{
 		Internal: &InternalPeer,
-        }
+	}
 	return TranslatedPeer
-}
-
-type TrafficPeer struct {
-	Internal *InternalPeer
-        // IP external to cluster
-	IP          string
 }
 
 // Internal to cluster
 type InternalPeer struct {
-        // optional: if set, will override remaining values with information from cluster
-        Workload string
-
+	// optional: if set, will override remaining values with information from cluster
+	Workload string
 	PodLabels       map[string]string
 	NamespaceLabels map[string]string
 	Namespace       string
-        // optional
-        Pods      []*PodNetworking
+	// optional
+	Pods []*PodNetworking
 }
 
 type PodNetworking struct {
-       IP string
-      // don't worry about populating below fields right now
-       IsHostNetworking bool
-       NodeLabels []string
+	IP string
+	// don't worry about populating below fields right now
+	IsHostNetworking bool
+	NodeLabels       []string
 }
