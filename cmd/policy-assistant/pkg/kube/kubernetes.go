@@ -113,6 +113,14 @@ func (k *Kubernetes) CreateNetworkPolicy(policy *networkingv1.NetworkPolicy) (*n
 	return createdPolicy, errors.Wrapf(err, "unable to create network policy %s/%s", policy.Namespace, policy.Name)
 }
 
+func (k *Kubernetes) GetDeploymentsInNamespace(namespace string) ([]appsv1.Deployment, error) {
+	deploymentList, err := k.ClientSet.AppsV1().Deployments(namespace).List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to get deployments in namespace %s", namespace)
+	}
+	return deploymentList.Items, nil
+}
+
 func (k *Kubernetes) GetReplicaSet(namespace string, name string) (*appsv1.ReplicaSet, error) {
 	replicaSet, err := k.ClientSet.AppsV1().ReplicaSets(namespace).Get(context.TODO(), name, metav1.GetOptions{})
 	return replicaSet, errors.Wrapf(err, "unable to get replicaSet %s/%s", namespace, name)
