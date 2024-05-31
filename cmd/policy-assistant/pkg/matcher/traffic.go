@@ -90,28 +90,40 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	ns, err := kubeClient.GetNamespace(workloadMetadata[0])
 	utils.DoOrDie(err)
 	kubePods, err := kube.GetPodsInNamespaces(kubeClient, []string{workloadMetadata[0]})
-	kubeDeployments, err := kubeClient.GetDeploymentsInNamespace(workloadMetadata[0])
+	//kubeDeployments, err := kubeClient.GetDeploymentsInNamespace(workloadMetadata[0])
 	//fmt.Println(kubeDeployments)
-	kubeDaemonSets, err := kubeClient.GetDaemonSetsInNamespace(workloadMetadata[0])
+	//kubeDaemonSets, err := kubeClient.GetDaemonSetsInNamespace(workloadMetadata[0])
 	//fmt.Println(kubeDaemonSets)
 	kubeNamespaces, err := kubeClient.GetAllNamespaces()
-	fmt.Println(kubeNamespaces)
+	//fmt.Println(kubeNamespaces)
 	if err != nil {
 		logrus.Fatalf("unable to read pods from kube, ns '%s': %+v", workloadMetadata[0], err)
 	}
 
 	for _, namespace := range kubeNamespaces.Items {
 		fmt.Println(namespace.Name)
-	}
-	for _, deployment := range kubeDeployments {
-		fmt.Println(deployment.Name)
+		kubeDeployments, err := kubeClient.GetDeploymentsInNamespace(namespace.Name)
+		if err != nil {
+			logrus.Fatalf("unable to read deployments from kube, ns '%s': %+v", namespace.Name, err)
+		}
+		for _, deployment := range kubeDeployments {
+			fmt.Println(deployment.Name)
+		}
+
 	}
 
-	for _, daemonSet := range kubeDaemonSets {
-		fmt.Println(daemonSet.Name)
+	for _, namespace := range kubeNamespaces.Items {
+		fmt.Println(namespace.Name)
+		kubeDaemonSets, err := kubeClient.GetDaemonSetsInNamespace(namespace.Name)
+		if err != nil {
+			logrus.Fatalf("unable to read daemonSets from kube, ns '%s': %+v", namespace.Name, err)
+		}
+		for _, daemonSet := range kubeDaemonSets {
+			fmt.Println(daemonSet.Name)
+		}
+
 	}
 
-	
 	for _, pod := range kubePods {
 		if workloadMetadata[1] == "daemonset" || workloadMetadata[1] == "statefulset" || workloadMetadata[1] == "replicaset" {
 			workloadOwner = pod.OwnerReferences[0].Name
