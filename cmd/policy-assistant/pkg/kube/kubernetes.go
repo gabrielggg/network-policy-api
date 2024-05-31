@@ -51,11 +51,6 @@ func (k *Kubernetes) GetAllNamespaces() (*v1.NamespaceList, error) {
 	return nsList, errors.Wrapf(err, "unable to list namespaces")
 }
 
-func (k *Kubernetes) GetAllNamespaces2() (v1.NamespaceList, error) {
-	nsList, err := k.ClientSet.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
-	return nsList, errors.Wrapf(err, "unable to list namespaces")
-}
-
 func (k *Kubernetes) SetNamespaceLabels(namespace string, labels map[string]string) (*v1.Namespace, error) {
 	ns, err := k.GetNamespace(namespace)
 	if err != nil {
