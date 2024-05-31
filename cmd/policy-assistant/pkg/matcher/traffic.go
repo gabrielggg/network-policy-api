@@ -90,7 +90,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	ns, err := kubeClient.GetNamespace(workloadMetadata[0])
 	utils.DoOrDie(err)
 	kubePods, err := kube.GetPodsInNamespaces(kubeClient, []string{workloadMetadata[0]})
-	kubeDeployments, err := kube.GetDeploymentsInNamespace(kubeClient, []string{workloadMetadata[0]})
+	kubeDeployments, err := kubeClient.GetDeploymentsInNamespace(kubeClient, []string{workloadMetadata[0]})
 	if err != nil {
 		logrus.Fatalf("unable to read pods from kube, ns '%s': %+v", workloadMetadata[0], err)
 	}
