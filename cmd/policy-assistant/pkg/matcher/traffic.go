@@ -100,6 +100,8 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 		logrus.Fatalf("unable to read pods from kube, ns '%s': %+v", workloadMetadata[0], err)
 	}
 
+	fmt.Println("------------------------------")
+
 	for _, namespace := range kubeNamespaces.Items {
 		fmt.Println(namespace.Name)
 		kubeDeployments, err := kubeClient.GetDeploymentsInNamespace(namespace.Name)
@@ -111,6 +113,8 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 		}
 
 	}
+
+	fmt.Println("------------------------------")
 
 	for _, namespace := range kubeNamespaces.Items {
 		fmt.Println(namespace.Name)
