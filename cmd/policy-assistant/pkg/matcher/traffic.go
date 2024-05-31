@@ -90,13 +90,19 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	ns, err := kubeClient.GetNamespace(workloadMetadata[0])
 	utils.DoOrDie(err)
 	kubePods, err := kube.GetPodsInNamespaces(kubeClient, []string{workloadMetadata[0]})
-	kubeDeployments, err := kubeClient.GetDeploymentsInNamespace(workloadMetadata[0])
+	//kubeDeployments, err := kubeClient.GetDeploymentsInNamespace(workloadMetadata[0])
 	fmt.Println(kubeDeployments)
 	kubeDaemonSets, err := kubeClient.GetDaemonSetsInNamespace(workloadMetadata[0])
 	fmt.Println(kubeDaemonSets)
 	if err != nil {
 		logrus.Fatalf("unable to read pods from kube, ns '%s': %+v", workloadMetadata[0], err)
 	}
+
+	for _, deployment := range kubeDeployments {
+		fmt.Println(deployment.Name)
+	}
+
+	
 	for _, pod := range kubePods {
 		if workloadMetadata[1] == "daemonset" || workloadMetadata[1] == "statefulset" || workloadMetadata[1] == "replicaset" {
 			workloadOwner = pod.OwnerReferences[0].Name
