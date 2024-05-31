@@ -121,12 +121,12 @@ func (k *Kubernetes) GetDeploymentsInNamespace(namespace string) ([]appsv1.Deplo
 	return deploymentList.Items, nil
 }
 
-func (k *Kubernetes) GetDaemonsetsInNamespace(namespace string) ([]appsv1.Daemonset, error) {
-	daemonsetList, err := k.ClientSet.AppsV1().Daemonsets(namespace).List(context.TODO(), metav1.ListOptions{})
+func (k *Kubernetes) GetDaemonSetsInNamespace(namespace string) ([]appsv1.DaemonSet, error) {
+	daemonSetList, err := k.ClientSet.AppsV1().DaemonSets(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		return nil, errors.Wrapf(err, "unable to get daemonsets in namespace %s", namespace)
+		return nil, errors.Wrapf(err, "unable to get daemonSets in namespace %s", namespace)
 	}
-	return daemonsetList.Items, nil
+	return daemonSetList.Items, nil
 }
 
 func (k *Kubernetes) GetReplicaSet(namespace string, name string) (*appsv1.ReplicaSet, error) {
