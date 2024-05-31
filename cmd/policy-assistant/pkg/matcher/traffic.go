@@ -90,8 +90,8 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	ns, err := kubeClient.GetNamespace(workloadMetadata[0])
 	utils.DoOrDie(err)
 	kubePods, err := kube.GetPodsInNamespaces(kubeClient, []string{workloadMetadata[0]})
-	//kubeDeployments, err := kubeClient.GetDeploymentsInNamespace(workloadMetadata[0])
-	fmt.Println(kubeDeployments)
+	kubeDeployments, err := kubeClient.GetDeploymentsInNamespace(workloadMetadata[0])
+	//fmt.Println(kubeDeployments)
 	kubeDaemonSets, err := kubeClient.GetDaemonSetsInNamespace(workloadMetadata[0])
 	fmt.Println(kubeDaemonSets)
 	if err != nil {
