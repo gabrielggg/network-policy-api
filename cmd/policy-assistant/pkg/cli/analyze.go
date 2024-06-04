@@ -12,7 +12,6 @@ import (
 	"github.com/mattfenwick/cyclonus/pkg/generator"
 
 	"github.com/mattfenwick/cyclonus/pkg/kube"
-	"github.com/mattfenwick/cyclonus/pkg/traffic"
 	"github.com/mattfenwick/cyclonus/pkg/matcher"
 	"github.com/mattfenwick/cyclonus/pkg/utils"
 	"github.com/pkg/errors"
