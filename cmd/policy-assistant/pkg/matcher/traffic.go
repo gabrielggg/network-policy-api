@@ -151,13 +151,13 @@ func DeploymentsToTrafficPeers() []TrafficPeer {
 			logrus.Fatalf("unable to read deployments from kube, ns '%s': %+v", namespace.Name, err)
 		}
 		for _, deployment := range kubeDeployments {
+			fmt.Println(namespace.Name+"/deployment/"+deployment.Name)
 			TmpInternalPeer := InternalPeer{
 				Workload: namespace.Name+"/deployment/"+deployment.Name,
 			}
 			TmpPeer := TrafficPeer{
 				Internal: &TmpInternalPeer,
 			}
-			TmpPeer.Translate()
 			deploymentPeers = append(deploymentPeers, TmpPeer.Translate())
 		}
 
@@ -187,7 +187,6 @@ func DaemonSetsToTrafficPeers() []TrafficPeer {
 			TmpPeer := TrafficPeer{
 				Internal: &TmpInternalPeer,
 			}
-			TmpPeer.Translate()
 			daemonSetPeers = append(daemonSetPeers, TmpPeer.Translate())
 		}
 
