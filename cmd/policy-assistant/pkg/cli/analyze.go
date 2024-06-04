@@ -216,43 +216,12 @@ func QueryTargetHelper(policies *matcher.Policy, pod *QueryTargetPod) (*matcher.
 	return matcher.NewPolicyWithTargets(ingressTargets, egressTargets), matcher.NewPolicyWithTargets(combinedIngresses, combinedEgresses)
 }
 
-func deploymentsToTrafficPeers() []TrafficPeer {
-	var deploymentPeers []TrafficPeer
-	kubeClient, err := kube.NewKubernetesForContext("")
-	utils.DoOrDie(err)
-	kubeNamespaces, err := kubeClient.GetAllNamespaces()
-	if err != nil {
-		logrus.Fatalf("unable to read namespaces from kube: %+v", err)
-	}
-
-	for _, namespace := range kubeNamespaces.Items {
-		kubeDeployments, err := kubeClient.GetDeploymentsInNamespace(namespace.Name)
-		if err != nil {
-			logrus.Fatalf("unable to read deployments from kube, ns '%s': %+v", namespace.Name, err)
-		}
-		for _, deployment := range kubeDeployments {
-			TmpInternalPeer := InternalPeer{
-				Workload: namespace.Name+"/deployment/"+deployment.Name,
-			}
-			TmpPeer := TrafficPeer{
-				Internal: &TmpInternalPeer,
-			}
-			TmpPeer.Translate()
-			deploymentPeers = append(deploymentPeers, TmpPeer.Translate())
-		}
-
-	}
-
-	return deploymentPeers
-}
-
 func QueryTraffic(explainedPolicies *matcher.Policy, trafficPath string) {
 	if trafficPath == "" {
 		logrus.Fatalf("%+v", errors.Errorf("path to traffic file required for QueryTraffic command"))
 	}
 	allTraffics, err := json.ParseFile[[]*matcher.Traffic](trafficPath)
 	utils.DoOrDie(err)
-	deploymentsToTrafficPeers()
 	for _, traffic := range *allTraffics {
 		b, err := json.Marshal(traffic.Source.Translate())
 		if err != nil {
