@@ -94,14 +94,14 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 		logrus.Fatalf("unable to read pods from kube, ns '%s': %+v", workloadMetadata[0], err)
 	}
 	for _, pod := range kubePods {
-		if workloadMetadata[1] == "daemonset" || workloadMetadata[1] == "statefulset" || workloadMetadata[1] == "replicaset" {
-			workloadOwner = pod.OwnerReferences[0].Name
-		} else if workloadMetadata[1] == "deployment" && pod.OwnerReferences[0].Kind == "ReplicaSet" {
+		 if workloadMetadata[1] == "deployment" && pod.OwnerReferences[0].Kind == "ReplicaSet" {
 			kubeReplicaSets, err := kubeClient.GetReplicaSet(workloadMetadata[0], pod.OwnerReferences[0].Name)
 			if err != nil {
 				logrus.Fatalf("unable to read Replicaset from kube, rs '%s': %+v", pod.OwnerReferences[0].Name, err)
 			}
 			workloadOwner = kubeReplicaSets.OwnerReferences[0].Name
+		} else if workloadMetadata[1] == "daemonset" || workloadMetadata[1] == "statefulset" || workloadMetadata[1] == "replicaset" {
+			workloadOwner = pod.OwnerReferences[0].Name
 		} else if workloadMetadata[1] == "pod" {
 			workloadOwner = pod.Name
 		}
