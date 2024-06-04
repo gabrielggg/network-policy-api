@@ -180,6 +180,7 @@ func DaemonSetsToTrafficPeers() []TrafficPeer {
 			logrus.Fatalf("unable to read daemonSets from kube, ns '%s': %+v", namespace.Name, err)
 		}
 		for _, daemonSet := range kubeDaemonSets {
+			fmt.Println(namespace.Name+"/daemonset/"+deployment.Name)
 			TmpInternalPeer := InternalPeer{
 				Workload: namespace.Name+"/daemonset/"+daemonSet.Name,
 			}
