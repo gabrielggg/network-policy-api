@@ -170,6 +170,72 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	return TranslatedPeer
 }
 
+func deploymentsToTrafficPeers() []TrafficPeer {
+	var podsNetworking []*PodNetworking
+	var podLabels map[string]string
+	var namespaceLabels map[string]string
+	var deploymentPeers []TrafficPeer
+	kubeClient, err := kube.NewKubernetesForContext("")
+	utils.DoOrDie(err)
+	kubeNamespaces, err := kubeClient.GetAllNamespaces()
+	if err != nil {
+		logrus.Fatalf("unable to read namespaces from kube: %+v", err)
+	}
+
+	for _, namespace := range kubeNamespaces.Items {
+		kubeDeployments, err := kubeClient.GetDeploymentsInNamespace(namespace.Name)
+		if err != nil {
+			logrus.Fatalf("unable to read deployments from kube, ns '%s': %+v", namespace.Name, err)
+		}
+		for _, deployment := range kubeDeployments {
+			TmpInternalPeer := InternalPeer{
+				Workload: namespace.Name+"/deployment/"+deployment.Name,
+			}
+			TmpPeer := TrafficPeer{
+				Internal: &TmpInternalPeer,
+			}
+			TmpPeer.Translate()
+			deploymentPeers = append(deploymentPeers, TmpPeer.Translate())
+		}
+
+	}
+
+	return deploymentPeers
+}
+
+func daemonSetsToTrafficPeers() []TrafficPeer {
+	var podsNetworking []*PodNetworking
+	var podLabels map[string]string
+	var namespaceLabels map[string]string
+	var daemonSetPeers []TrafficPeer
+	kubeClient, err := kube.NewKubernetesForContext("")
+	utils.DoOrDie(err)
+	kubeNamespaces, err := kubeClient.GetAllNamespaces()
+	if err != nil {
+		logrus.Fatalf("unable to read namespaces from kube: %+v", err)
+	}
+
+	for _, namespace := range kubeNamespaces.Items {
+		kubeDaemonSets, err := kubeClient.GetDaemonSetsInNamespace(namespace.Name)
+		if err != nil {
+			logrus.Fatalf("unable to read daemonSets from kube, ns '%s': %+v", namespace.Name, err)
+		}
+		for _, daemonSet := range kubeDaemonSets {
+			TmpInternalPeer := InternalPeer{
+				Workload: namespace.Name+"/daemonset/"+daemonSet.Name,
+			}
+			TmpPeer := TrafficPeer{
+				Internal: &TmpInternalPeer,
+			}
+			TmpPeer.Translate()
+			daemonSetPeers = append(daemonSetPeers, TmpPeer.Translate())
+		}
+
+	}
+
+	return daemonSetPeers
+}
+
 // Internal to cluster
 type InternalPeer struct {
 	// optional: if set, will override remaining values with information from cluster
