@@ -175,7 +175,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	return TranslatedPeer
 }
 
-func (p *TrafficPeer) deploymentsToTrafficPeers() []TrafficPeer {
+func deploymentsToTrafficPeers() []TrafficPeer {
 	var deploymentPeers []TrafficPeer
 	kubeClient, err := kube.NewKubernetesForContext("")
 	utils.DoOrDie(err)
@@ -205,7 +205,7 @@ func (p *TrafficPeer) deploymentsToTrafficPeers() []TrafficPeer {
 	return deploymentPeers
 }
 
-func (p *TrafficPeer) daemonSetsToTrafficPeers() []TrafficPeer {
+func daemonSetsToTrafficPeers() []TrafficPeer {
 	var daemonSetPeers []TrafficPeer
 	kubeClient, err := kube.NewKubernetesForContext("")
 	utils.DoOrDie(err)
