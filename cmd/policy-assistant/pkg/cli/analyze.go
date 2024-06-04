@@ -6,6 +6,7 @@ import (
 	"github.com/mattfenwick/cyclonus/pkg/kube/netpol"
 	"sigs.k8s.io/network-policy-api/apis/v1alpha1"
 	"strings"
+	"../matcher"
 
 	"github.com/mattfenwick/collections/pkg/json"
 	"github.com/mattfenwick/cyclonus/pkg/connectivity/probe"
