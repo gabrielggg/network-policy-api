@@ -30,7 +30,7 @@ func (t *Traffic) Table() string {
 
 	pp := fmt.Sprintf("%d (%s) on %s", t.ResolvedPort, t.ResolvedPortName, t.Protocol)
 	table.SetHeader([]string{"Port/Protocol", "Source/Dest", "Pod IP", "Namespace", "NS Labels", "Pod Labels"})
-	deploymentsToTrafficPeers()
+	
 	source := []string{pp, "source", t.Source.IP}
 	if t.Source.Internal != nil {
 		i := t.Source.Internal
@@ -48,6 +48,7 @@ func (t *Traffic) Table() string {
 		dest = append(dest, "", "", "")
 	}
 	table.Append(dest)
+	deploymentsToTrafficPeers()
 
 	table.Render()
 	return tableString.String()
