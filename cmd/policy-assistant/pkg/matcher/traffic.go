@@ -48,7 +48,6 @@ func (t *Traffic) Table() string {
 		dest = append(dest, "", "", "")
 	}
 	table.Append(dest)
-	//deploymentsToTrafficPeers()
 
 	table.Render()
 	return tableString.String()
@@ -176,7 +175,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	return TranslatedPeer
 }
 
-func deploymentsToTrafficPeers() []TrafficPeer {
+func (p *TrafficPeer) deploymentsToTrafficPeers() []TrafficPeer {
 	var deploymentPeers []TrafficPeer
 	kubeClient, err := kube.NewKubernetesForContext("")
 	utils.DoOrDie(err)
@@ -206,7 +205,7 @@ func deploymentsToTrafficPeers() []TrafficPeer {
 	return deploymentPeers
 }
 
-func daemonSetsToTrafficPeers() []TrafficPeer {
+func (p *TrafficPeer) daemonSetsToTrafficPeers() []TrafficPeer {
 	var daemonSetPeers []TrafficPeer
 	kubeClient, err := kube.NewKubernetesForContext("")
 	utils.DoOrDie(err)
