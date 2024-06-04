@@ -222,8 +222,8 @@ func QueryTraffic(explainedPolicies *matcher.Policy, trafficPath string) {
 	}
 	allTraffics, err := json.ParseFile[[]*matcher.Traffic](trafficPath)
 	utils.DoOrDie(err)
-	deploymentsToTrafficPeers()
-	daemonSetsToTrafficPeers()
+	matcher.Traffic.deploymentsToTrafficPeers()
+	matcher.Traffic.daemonSetsToTrafficPeers()
 	for _, traffic := range *allTraffics {
 		b, err := json.Marshal(traffic.Source.Translate())
 		if err != nil {
