@@ -224,7 +224,7 @@ func QueryTraffic(explainedPolicies *matcher.Policy, trafficPath string) {
 	utils.DoOrDie(err)
 	fmt.Println(matcher.DeploymentsToTrafficPeers())
 	for _, traffic := range *allTraffics {
-		b, err := json.Marshal(traffic.Source.Translate())
+		b, err := json.Marshal(matcher.DeploymentsToTrafficPeers())
 		if err != nil {
 			fmt.Println(err)
 			return
