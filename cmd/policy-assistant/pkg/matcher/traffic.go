@@ -48,7 +48,7 @@ func (t *Traffic) Table() string {
 		dest = append(dest, "", "", "")
 	}
 	table.Append(dest)
-	deploymentsToTrafficPeers()
+	//deploymentsToTrafficPeers()
 
 	table.Render()
 	return tableString.String()
