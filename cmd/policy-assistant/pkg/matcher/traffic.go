@@ -81,6 +81,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	var namespaceLabels map[string]string
 	var workloadOwner string
 	workloadOwnerExists := false
+	fmt.Println(p.Internal.Workload)
 	workloadMetadata := strings.Split(strings.ToLower(p.Internal.Workload), "/")
 	if len(workloadMetadata) != 3 || (workloadMetadata[0] == "" || workloadMetadata[1] == "" || workloadMetadata[2] == "") || (workloadMetadata[1] != "daemonset" && workloadMetadata[1] != "statefulset" && workloadMetadata[1] != "replicaset" && workloadMetadata[1] != "deployment" && workloadMetadata[1] != "pod") {
 		logrus.Fatalf("Bad Workload structure: Types supported are pod, replicaset, deployment, daemonset, statefulset, and 3 fields are required with this structure, <namespace>/<workloadType>/<workloadName>")
