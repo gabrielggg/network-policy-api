@@ -128,6 +128,11 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 
 	}
 
+	deploymentsToTrafficPeers()
+
+	
+	
+
 	for _, pod := range kubePods {
 		if workloadMetadata[1] == "daemonset" || workloadMetadata[1] == "statefulset" || workloadMetadata[1] == "replicaset" {
 			workloadOwner = pod.OwnerReferences[0].Name
