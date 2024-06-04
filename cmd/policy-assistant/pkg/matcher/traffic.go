@@ -100,39 +100,6 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 		logrus.Fatalf("unable to read pods from kube, ns '%s': %+v", workloadMetadata[0], err)
 	}
 
-	fmt.Println("------------------------------")
-
-	for _, namespace := range kubeNamespaces.Items {
-		fmt.Println(namespace.Name)
-		kubeDeployments, err := kubeClient.GetDeploymentsInNamespace(namespace.Name)
-		if err != nil {
-			logrus.Fatalf("unable to read deployments from kube, ns '%s': %+v", namespace.Name, err)
-		}
-		for _, deployment := range kubeDeployments {
-			fmt.Println(deployment.Name)
-		}
-
-	}
-
-	fmt.Println("------------------------------")
-
-	for _, namespace := range kubeNamespaces.Items {
-		fmt.Println(namespace.Name)
-		kubeDaemonSets, err := kubeClient.GetDaemonSetsInNamespace(namespace.Name)
-		if err != nil {
-			logrus.Fatalf("unable to read daemonSets from kube, ns '%s': %+v", namespace.Name, err)
-		}
-		for _, daemonSet := range kubeDaemonSets {
-			fmt.Println(daemonSet.Name)
-		}
-
-	}
-
-	
-
-	
-	
-
 	for _, pod := range kubePods {
 		if workloadMetadata[1] == "daemonset" || workloadMetadata[1] == "statefulset" || workloadMetadata[1] == "replicaset" {
 			workloadOwner = pod.OwnerReferences[0].Name
