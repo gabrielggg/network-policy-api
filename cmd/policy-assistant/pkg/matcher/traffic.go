@@ -118,16 +118,21 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	}
 
 	if !workloadOwnerExists {
-		logrus.Fatalf("workload not found on the cluster")
-	}
-
-	InternalPeer := InternalPeer{
+		logrus.Infof("workload not found on the cluster")
+		InternalPeer := InternalPeer{
+			Workload: "",
+		}
+	} else {
+		InternalPeer := InternalPeer{
 		Workload:        p.Internal.Workload,
 		PodLabels:       podLabels,
 		NamespaceLabels: namespaceLabels,
 		Namespace:       workloadMetadata[0],
 		Pods:            podsNetworking,
+		}
 	}
+
+	
 
 	TranslatedPeer := TrafficPeer{
 		Internal: &InternalPeer,
