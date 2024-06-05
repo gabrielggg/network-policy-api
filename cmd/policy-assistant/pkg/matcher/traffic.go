@@ -163,7 +163,11 @@ func DeploymentsToTrafficPeers() []TrafficPeer {
 			TmpPeer := TrafficPeer{
 				Internal: &TmpInternalPeer,
 			}
-			deploymentPeers = append(deploymentPeers, TmpPeer.Translate())
+			TmpPeerTranslated := TmpPeer.Translate()
+			if TmpPeerTranslated.Internal.Workload != "" {
+				deploymentPeers = append(deploymentPeers, TmpPeerTranslated)
+			}
+			
 		}
 
 	}
@@ -193,7 +197,10 @@ func DaemonSetsToTrafficPeers() []TrafficPeer {
 			TmpPeer := TrafficPeer{
 				Internal: &TmpInternalPeer,
 			}
-			daemonSetPeers = append(daemonSetPeers, TmpPeer.Translate())
+			TmpPeerTranslated := TmpPeer.Translate()
+			if TmpPeerTranslated.Internal.Workload != "" {
+				daemonSetPeers = append(deploymentPeers, TmpPeerTranslated)
+			}
 		}
 
 	}
