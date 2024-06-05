@@ -80,7 +80,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	var podLabels map[string]string
 	var namespaceLabels map[string]string
 	var workloadOwner string
-	var InternalPeer InternalPeer
+	var internalPeer InternalPeer
 	workloadOwnerExists := false
 	workloadMetadata := strings.Split(strings.ToLower(p.Internal.Workload), "/")
 	if len(workloadMetadata) != 3 || (workloadMetadata[0] == "" || workloadMetadata[1] == "" || workloadMetadata[2] == "") || (workloadMetadata[1] != "daemonset" && workloadMetadata[1] != "statefulset" && workloadMetadata[1] != "replicaset" && workloadMetadata[1] != "deployment" && workloadMetadata[1] != "pod") {
@@ -120,11 +120,11 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 
 	if !workloadOwnerExists {
 		logrus.Infof("workload not found on the cluster")
-		InternalPeer := InternalPeer{
+		internalPeer := InternalPeer{
 			Workload: "",
 		}
 	} else {
-		InternalPeer := InternalPeer{
+		internalPeer := InternalPeer{
 		Workload:        p.Internal.Workload,
 		PodLabels:       podLabels,
 		NamespaceLabels: namespaceLabels,
@@ -136,7 +136,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	
 
 	TranslatedPeer := TrafficPeer{
-		Internal: &InternalPeer,
+		Internal: &internalPeer,
 	}
 	return TranslatedPeer
 }
