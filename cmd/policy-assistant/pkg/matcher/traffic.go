@@ -156,7 +156,6 @@ func DeploymentsToTrafficPeers() []TrafficPeer {
 			logrus.Fatalf("unable to read deployments from kube, ns '%s': %+v", namespace.Name, err)
 		}
 		for _, deployment := range kubeDeployments {
-			fmt.Println(namespace.Name+"/deployment/"+deployment.Name)
 			TmpInternalPeer := InternalPeer{
 				Workload: namespace.Name+"/deployment/"+deployment.Name,
 			}
@@ -190,7 +189,6 @@ func DaemonSetsToTrafficPeers() []TrafficPeer {
 			logrus.Fatalf("unable to read daemonSets from kube, ns '%s': %+v", namespace.Name, err)
 		}
 		for _, daemonSet := range kubeDaemonSets {
-			fmt.Println(namespace.Name+"/daemonset/"+daemonSet.Name)
 			TmpInternalPeer := InternalPeer{
 				Workload: namespace.Name+"/daemonset/"+daemonSet.Name,
 			}
