@@ -199,7 +199,7 @@ func DaemonSetsToTrafficPeers() []TrafficPeer {
 			}
 			TmpPeerTranslated := TmpPeer.Translate()
 			if TmpPeerTranslated.Internal.Workload != "" {
-				daemonSetPeers = append(deploymentPeers, TmpPeerTranslated)
+				daemonSetPeers = append(daemonSetPeers, TmpPeerTranslated)
 			}
 		}
 
