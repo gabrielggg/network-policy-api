@@ -206,6 +206,70 @@ func DaemonSetsToTrafficPeers() []TrafficPeer {
 	return daemonSetPeers
 }
 
+func StatefulSetsToTrafficPeers() []TrafficPeer {
+	var statefulSetPeers []TrafficPeer
+	kubeClient, err := kube.NewKubernetesForContext("")
+	utils.DoOrDie(err)
+	kubeNamespaces, err := kubeClient.GetAllNamespaces()
+	if err != nil {
+		logrus.Fatalf("unable to read namespaces from kube: %+v", err)
+	}
+
+	for _, namespace := range kubeNamespaces.Items {
+		kubeStatefulSets, err := kubeClient.GetStatefulSetsInNamespace(namespace.Name)
+		if err != nil {
+			logrus.Fatalf("unable to read statefulSets from kube, ns '%s': %+v", namespace.Name, err)
+		}
+		for _, statefulSet := range kubeStatefulSets {
+			TmpInternalPeer := InternalPeer{
+				Workload: namespace.Name+"/statefulset/"+statefulSet.Name,
+			}
+			TmpPeer := TrafficPeer{
+				Internal: &TmpInternalPeer,
+			}
+			TmpPeerTranslated := TmpPeer.Translate()
+			if TmpPeerTranslated.Internal.Workload != "" {
+				statefulSetPeers = append(statefulSetPeers, TmpPeerTranslated)
+			}
+		}
+
+	}
+
+	return statefulSetPeers
+}
+
+func PodsToTrafficPeers() []TrafficPeer {
+	var PodPeers []TrafficPeer
+	kubeClient, err := kube.NewKubernetesForContext("")
+	utils.DoOrDie(err)
+	kubeNamespaces, err := kubeClient.GetAllNamespaces()
+	if err != nil {
+		logrus.Fatalf("unable to read namespaces from kube: %+v", err)
+	}
+
+	for _, namespace := range kubeNamespaces.Items {
+		kubePods, err := kube.GetPodsInNamespaces(kubeClient, []string{namespace.Name})
+		if err != nil {
+			logrus.Fatalf("unable to read pods from kube, ns '%s': %+v", namespace.Name, err)
+		}
+		for _, pod := range kubePods {
+			TmpInternalPeer := InternalPeer{
+				Workload: namespace.Name+"/pod/"+pod.Name,
+			}
+			TmpPeer := TrafficPeer{
+				Internal: &TmpInternalPeer,
+			}
+			TmpPeerTranslated := TmpPeer.Translate()
+			if TmpPeerTranslated.Internal.Workload != "" {
+				PodPeers = append(PodPeers, TmpPeerTranslated)
+			}
+		}
+
+	}
+
+	return PodPeers
+}
+
 // Internal to cluster
 type InternalPeer struct {
 	// optional: if set, will override remaining values with information from cluster
