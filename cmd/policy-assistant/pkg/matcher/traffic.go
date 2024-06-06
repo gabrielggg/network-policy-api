@@ -238,6 +238,38 @@ func StatefulSetsToTrafficPeers() []TrafficPeer {
 	return statefulSetPeers
 }
 
+func ReplicaSetsToTrafficPeers() []TrafficPeer {
+	var replicaSetPeers []TrafficPeer
+	kubeClient, err := kube.NewKubernetesForContext("")
+	utils.DoOrDie(err)
+	kubeNamespaces, err := kubeClient.GetAllNamespaces()
+	if err != nil {
+		logrus.Fatalf("unable to read namespaces from kube: %+v", err)
+	}
+
+	for _, namespace := range kubeNamespaces.Items {
+		kubeReplicaSets, err := kubeClient.GetReplicaSetsInNamespace(namespace.Name)
+		if err != nil {
+			logrus.Fatalf("unable to read replicaSets from kube, ns '%s': %+v", namespace.Name, err)
+		}
+		for _, replicaSet := range kubeReplicaSets {
+			TmpInternalPeer := InternalPeer{
+				Workload: namespace.Name+"/replicaset/"+replicaSet.Name,
+			}
+			TmpPeer := TrafficPeer{
+				Internal: &TmpInternalPeer,
+			}
+			TmpPeerTranslated := TmpPeer.Translate()
+			if TmpPeerTranslated.Internal.Workload != "" {
+				replicaSetPeers = append(replicaSetPeers, TmpPeerTranslated)
+			}
+		}
+
+	}
+
+	return replicaSetPeers
+}
+
 func PodsToTrafficPeers() []TrafficPeer {
 	var PodPeers []TrafficPeer
 	kubeClient, err := kube.NewKubernetesForContext("")
