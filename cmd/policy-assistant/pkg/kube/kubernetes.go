@@ -138,7 +138,7 @@ func (k *Kubernetes) GetStatefulSetsInNamespace(namespace string) ([]appsv1.Stat
 }
 
 func (k *Kubernetes) GetReplicaSetsInNamespace(namespace string) ([]appsv1.ReplicaSet, error) {
-	replicaSetList, err := k.ClientSet.AppsV1().ReplicaSets(namespace).List(context.TODO())
+	replicaSetList, err := k.ClientSet.AppsV1().ReplicaSets(namespace).List(context.TODO(), metav1.ListOptions)
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to get ReplicaSets in namespace %s", namespace)
 	}
