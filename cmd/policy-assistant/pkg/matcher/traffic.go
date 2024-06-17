@@ -257,7 +257,7 @@ func ReplicaSetsToTrafficPeers() []TrafficPeer {
 		}
 		
 		for _, replicaSet := range kubeReplicaSets {
-			if replicaSet.OwnerReferences[0].Name != "" {
+			if replicaSet.OwnerReferences != nil {
 				logrus.Infof("replicaset already handled")
 			} else {
 				TmpInternalPeer := InternalPeer{
