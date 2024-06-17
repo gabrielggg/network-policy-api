@@ -240,6 +240,7 @@ func StatefulSetsToTrafficPeers() []TrafficPeer {
 
 func ReplicaSetsToTrafficPeers() []TrafficPeer {
 	var replicaSetPeers []TrafficPeer
+	var replicaSetWorkloadOwner string
 	kubeClient, err := kube.NewKubernetesForContext("")
 	utils.DoOrDie(err)
 	kubeNamespaces, err := kubeClient.GetAllNamespaces()
@@ -252,17 +253,22 @@ func ReplicaSetsToTrafficPeers() []TrafficPeer {
 		if err != nil {
 			logrus.Fatalf("unable to read replicaSets from kube, ns '%s': %+v", namespace.Name, err)
 		}
+		
 		for _, replicaSet := range kubeReplicaSets {
-			TmpInternalPeer := InternalPeer{
+			if replicaSet.OwnerReferences[0].Name == nil {
+				TmpInternalPeer := InternalPeer{
 				Workload: namespace.Name+"/replicaset/"+replicaSet.Name,
-			}
-			TmpPeer := TrafficPeer{
-				Internal: &TmpInternalPeer,
-			}
-			TmpPeerTranslated := TmpPeer.Translate()
-			if TmpPeerTranslated.Internal.Workload != "" {
-				replicaSetPeers = append(replicaSetPeers, TmpPeerTranslated)
-			}
+				}
+				TmpPeer := TrafficPeer{
+					Internal: &TmpInternalPeer,
+				}
+				TmpPeerTranslated := TmpPeer.Translate()
+				if TmpPeerTranslated.Internal.Workload != "" {
+					replicaSetPeers = append(replicaSetPeers, TmpPeerTranslated)
+				}
+			} else {
+				logrus.Infof("replicaset already handled")
+			}			
 		}
 
 	}
