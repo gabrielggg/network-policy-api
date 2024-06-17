@@ -100,7 +100,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 			if err != nil {
 				logrus.Fatalf("unable to read Replicaset from kube, rs '%s': %+v", pod.OwnerReferences[0].Name, err)
 			}
-			if kubeReplicaSets.OwnerReferences[0].Name != "" {
+			if kubeReplicaSets.OwnerReferences != nil {
 				workloadOwner = kubeReplicaSets.OwnerReferences[0].Name
 			}
 			
