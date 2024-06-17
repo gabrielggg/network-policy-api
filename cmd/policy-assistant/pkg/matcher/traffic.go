@@ -159,15 +159,15 @@ func DeploymentsToTrafficPeers() []TrafficPeer {
 			logrus.Fatalf("unable to read deployments from kube, ns '%s': %+v", namespace.Name, err)
 		}
 		for _, deployment := range kubeDeployments {
-			TmpInternalPeer := InternalPeer{
+			tmpInternalPeer := InternalPeer{
 				Workload: namespace.Name+"/deployment/"+deployment.Name,
 			}
-			TmpPeer := TrafficPeer{
-				Internal: &TmpInternalPeer,
+			tmpPeer := TrafficPeer{
+				Internal: &tmpInternalPeer,
 			}
-			TmpPeerTranslated := TmpPeer.Translate()
-			if TmpPeerTranslated.Internal.Workload != "" {
-				deploymentPeers = append(deploymentPeers, TmpPeerTranslated)
+			tmpPeerTranslated := tmpPeer.Translate()
+			if tmpPeerTranslated.Internal.Workload != "" {
+				deploymentPeers = append(deploymentPeers, tmpPeerTranslated)
 			}
 			
 		}
@@ -192,15 +192,15 @@ func DaemonSetsToTrafficPeers() []TrafficPeer {
 			logrus.Fatalf("unable to read daemonSets from kube, ns '%s': %+v", namespace.Name, err)
 		}
 		for _, daemonSet := range kubeDaemonSets {
-			TmpInternalPeer := InternalPeer{
+			tmpInternalPeer := InternalPeer{
 				Workload: namespace.Name+"/daemonset/"+daemonSet.Name,
 			}
-			TmpPeer := TrafficPeer{
-				Internal: &TmpInternalPeer,
+			tmpPeer := TrafficPeer{
+				Internal: &tmpInternalPeer,
 			}
-			TmpPeerTranslated := TmpPeer.Translate()
-			if TmpPeerTranslated.Internal.Workload != "" {
-				daemonSetPeers = append(daemonSetPeers, TmpPeerTranslated)
+			tmpPeerTranslated := tmpPeer.Translate()
+			if tmpPeerTranslated.Internal.Workload != "" {
+				daemonSetPeers = append(daemonSetPeers, tmpPeerTranslated)
 			}
 		}
 
@@ -224,15 +224,15 @@ func StatefulSetsToTrafficPeers() []TrafficPeer {
 			logrus.Fatalf("unable to read statefulSets from kube, ns '%s': %+v", namespace.Name, err)
 		}
 		for _, statefulSet := range kubeStatefulSets {
-			TmpInternalPeer := InternalPeer{
+			tmpInternalPeer := InternalPeer{
 				Workload: namespace.Name+"/statefulset/"+statefulSet.Name,
 			}
-			TmpPeer := TrafficPeer{
-				Internal: &TmpInternalPeer,
+			tmpPeer := TrafficPeer{
+				Internal: &tmpInternalPeer,
 			}
-			TmpPeerTranslated := TmpPeer.Translate()
-			if TmpPeerTranslated.Internal.Workload != "" {
-				statefulSetPeers = append(statefulSetPeers, TmpPeerTranslated)
+			tmpPeerTranslated := tmpPeer.Translate()
+			if tmpPeerTranslated.Internal.Workload != "" {
+				statefulSetPeers = append(statefulSetPeers, tmpPeerTranslated)
 			}
 		}
 
@@ -260,15 +260,15 @@ func ReplicaSetsToTrafficPeers() []TrafficPeer {
 			if replicaSet.OwnerReferences != nil {
 				logrus.Infof("replicaset already handled")
 			} else {
-				TmpInternalPeer := InternalPeer{
+				tmpInternalPeer := InternalPeer{
 				Workload: namespace.Name+"/replicaset/"+replicaSet.Name,
 				}
-				TmpPeer := TrafficPeer{
-					Internal: &TmpInternalPeer,
+				tmpPeer := TrafficPeer{
+					Internal: &tmpInternalPeer,
 				}
-				TmpPeerTranslated := TmpPeer.Translate()
-				if TmpPeerTranslated.Internal.Workload != "" {
-					replicaSetPeers = append(replicaSetPeers, TmpPeerTranslated)
+				tmpPeerTranslated := tmpPeer.Translate()
+				if tmpPeerTranslated.Internal.Workload != "" {
+					replicaSetPeers = append(replicaSetPeers, tmpPeerTranslated)
 				}
 				
 			}			
@@ -280,7 +280,7 @@ func ReplicaSetsToTrafficPeers() []TrafficPeer {
 }
 
 func PodsToTrafficPeers() []TrafficPeer {
-	var PodPeers []TrafficPeer
+	var podPeers []TrafficPeer
 	kubeClient, err := kube.NewKubernetesForContext("")
 	utils.DoOrDie(err)
 	kubeNamespaces, err := kubeClient.GetAllNamespaces()
@@ -297,22 +297,22 @@ func PodsToTrafficPeers() []TrafficPeer {
 			if pod.OwnerReferences != nil {
 				logrus.Infof("pod already handled")
 			} else {
-				TmpInternalPeer := InternalPeer{
+				tmpInternalPeer := InternalPeer{
 					Workload: namespace.Name+"/pod/"+pod.Name,
 				}
-				TmpPeer := TrafficPeer{
-					Internal: &TmpInternalPeer,
+				tmpPeer := TrafficPeer{
+					Internal: &tmpInternalPeer,
 				}
-				TmpPeerTranslated := TmpPeer.Translate()
-				if TmpPeerTranslated.Internal.Workload != "" {
-					PodPeers = append(PodPeers, TmpPeerTranslated)
+				tmpPeerTranslated := tmpPeer.Translate()
+				if tmpPeerTranslated.Internal.Workload != "" {
+					podPeers = append(podPeers, tmpPeerTranslated)
 				}
 			}
 		}
 
 	}
 
-	return PodPeers
+	return podPeers
 }
 
 // Internal to cluster
