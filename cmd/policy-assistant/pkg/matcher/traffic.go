@@ -291,15 +291,19 @@ func PodsToTrafficPeers() []TrafficPeer {
 			logrus.Fatalf("unable to read pods from kube, ns '%s': %+v", namespace.Name, err)
 		}
 		for _, pod := range kubePods {
-			TmpInternalPeer := InternalPeer{
-				Workload: namespace.Name+"/pod/"+pod.Name,
-			}
-			TmpPeer := TrafficPeer{
-				Internal: &TmpInternalPeer,
-			}
-			TmpPeerTranslated := TmpPeer.Translate()
-			if TmpPeerTranslated.Internal.Workload != "" {
-				PodPeers = append(PodPeers, TmpPeerTranslated)
+			if pod.OwnerReferences != nil {
+				logrus.Infof("pod already handled")
+			} else {
+				TmpInternalPeer := InternalPeer{
+					Workload: namespace.Name+"/pod/"+pod.Name,
+				}
+				TmpPeer := TrafficPeer{
+					Internal: &TmpInternalPeer,
+				}
+				TmpPeerTranslated := TmpPeer.Translate()
+				if TmpPeerTranslated.Internal.Workload != "" {
+					PodPeers = append(PodPeers, TmpPeerTranslated)
+				}
 			}
 		}
 
