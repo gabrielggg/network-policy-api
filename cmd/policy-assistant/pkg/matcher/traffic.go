@@ -80,6 +80,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	var podLabels map[string]string
 	var namespaceLabels map[string]string
 	var workloadOwner string
+	var workloadKind string
 	var internalPeer InternalPeer
 	workloadOwnerExists := false
 	workloadMetadata := strings.Split(strings.ToLower(p.Internal.Workload), "/")
@@ -106,10 +107,11 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 			
 		} else if (workloadMetadata[1] == "daemonset" || workloadMetadata[1] == "statefulset" || workloadMetadata[1] == "replicaset") && pod.OwnerReferences != nil {
 			workloadOwner = pod.OwnerReferences[0].Name
+			workloadKind  = pod.OwnerReferences[0].Kind
 		} else if workloadMetadata[1] == "pod" {
 			workloadOwner = pod.Name
 		}
-		if workloadOwner == workloadMetadata[2] {
+		if strings.ToLower(workloadOwner) == workloadMetadata[2] && strings.ToLower(workloadKind) == workloadMetadata[1] {
 			podLabels = pod.Labels
 			namespaceLabels = ns.Labels
 			podNetworking := PodNetworking{
@@ -258,7 +260,7 @@ func ReplicaSetsToTrafficPeers() []TrafficPeer {
 		
 		for _, replicaSet := range kubeReplicaSets {
 			if replicaSet.OwnerReferences != nil {
-				logrus.Infof("replicaset already handled")
+				continue
 			} else {
 				tmpInternalPeer := InternalPeer{
 				Workload: namespace.Name+"/replicaset/"+replicaSet.Name,
@@ -295,7 +297,7 @@ func PodsToTrafficPeers() []TrafficPeer {
 		}
 		for _, pod := range kubePods {
 			if pod.OwnerReferences != nil {
-				logrus.Infof("pod already handled")
+				continue
 			} else {
 				tmpInternalPeer := InternalPeer{
 					Workload: namespace.Name+"/pod/"+pod.Name,
