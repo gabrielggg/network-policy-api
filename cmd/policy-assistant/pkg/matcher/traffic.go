@@ -76,6 +76,7 @@ func (p *TrafficPeer) IsExternal() bool {
 }
 
 func (p *TrafficPeer) Translate() TrafficPeer {
+	//Translates kubernetes workload types to TrafficPeers.
 	var podsNetworking []*PodNetworking
 	var podLabels map[string]string
 	var namespaceLabels map[string]string
@@ -149,6 +150,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 }
 
 func DeploymentsToTrafficPeers() []TrafficPeer {
+	//Translates all pods associated with deployments to TrafficPeers.
 	var deploymentPeers []TrafficPeer
 	kubeClient, err := kube.NewKubernetesForContext("")
 	utils.DoOrDie(err)
@@ -182,6 +184,7 @@ func DeploymentsToTrafficPeers() []TrafficPeer {
 }
 
 func DaemonSetsToTrafficPeers() []TrafficPeer {
+	//Translates all pods associated with daemonSets to TrafficPeers.
 	var daemonSetPeers []TrafficPeer
 	kubeClient, err := kube.NewKubernetesForContext("")
 	utils.DoOrDie(err)
@@ -214,6 +217,7 @@ func DaemonSetsToTrafficPeers() []TrafficPeer {
 }
 
 func StatefulSetsToTrafficPeers() []TrafficPeer {
+	//Translates all pods associated with statefulSets to TrafficPeers.
 	var statefulSetPeers []TrafficPeer
 	kubeClient, err := kube.NewKubernetesForContext("")
 	utils.DoOrDie(err)
@@ -246,6 +250,7 @@ func StatefulSetsToTrafficPeers() []TrafficPeer {
 }
 
 func ReplicaSetsToTrafficPeers() []TrafficPeer {
+	//Translates all pods associated with replicaSets that are not associated with deployments to TrafficPeers.
 	var replicaSetPeers []TrafficPeer
 	kubeClient, err := kube.NewKubernetesForContext("")
 	utils.DoOrDie(err)
@@ -284,6 +289,7 @@ func ReplicaSetsToTrafficPeers() []TrafficPeer {
 }
 
 func PodsToTrafficPeers() []TrafficPeer {
+	//Translates all pods that are not associated with other workload types (deployment, replicaSet, daemonSet, statefulSet.) to TrafficPeers.
 	var podPeers []TrafficPeer
 	kubeClient, err := kube.NewKubernetesForContext("")
 	utils.DoOrDie(err)
