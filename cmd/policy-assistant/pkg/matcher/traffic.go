@@ -30,7 +30,7 @@ func (t *Traffic) Table() string {
 
 	pp := fmt.Sprintf("%d (%s) on %s", t.ResolvedPort, t.ResolvedPortName, t.Protocol)
 	table.SetHeader([]string{"Port/Protocol", "Source/Dest", "Pod IP", "Namespace", "NS Labels", "Pod Labels"})
-	
+
 	source := []string{pp, "source", t.Source.IP}
 	if t.Source.Internal != nil {
 		i := t.Source.Internal
@@ -324,7 +324,6 @@ func PodsToTrafficPeers() []TrafficPeer {
 
 	return podPeers
 }
-
 // Internal to cluster
 type InternalPeer struct {
 	// optional: if set, will override remaining values with information from cluster
