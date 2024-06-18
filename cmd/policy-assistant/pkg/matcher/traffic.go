@@ -97,22 +97,22 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 		logrus.Fatalf("unable to read pods from kube, ns '%s': %+v", workloadMetadata[0], err)
 	}
 	for _, pod := range kubePods {
-		 if workloadMetadata[1] == "deployment" && pod.OwnerReferences != nil &&  pod.OwnerReferences[0].Kind == "ReplicaSet" {
+		if workloadMetadata[1] == "deployment" && pod.OwnerReferences != nil && pod.OwnerReferences[0].Kind == "ReplicaSet" {
 			kubeReplicaSets, err := kubeClient.GetReplicaSet(workloadMetadata[0], pod.OwnerReferences[0].Name)
 			if err != nil {
 				logrus.Fatalf("unable to read Replicaset from kube, rs '%s': %+v", pod.OwnerReferences[0].Name, err)
 			}
 			if kubeReplicaSets.OwnerReferences != nil {
 				workloadOwner = kubeReplicaSets.OwnerReferences[0].Name
-				workloadKind  = "deployment"
+				workloadKind = "deployment"
 			}
-			
+
 		} else if (workloadMetadata[1] == "daemonset" || workloadMetadata[1] == "statefulset" || workloadMetadata[1] == "replicaset") && pod.OwnerReferences != nil {
 			workloadOwner = pod.OwnerReferences[0].Name
-			workloadKind  = pod.OwnerReferences[0].Kind
+			workloadKind = pod.OwnerReferences[0].Kind
 		} else if workloadMetadata[1] == "pod" {
 			workloadOwner = pod.Name
-			workloadKind  = "pod"
+			workloadKind = "pod"
 		}
 		if strings.ToLower(workloadOwner) == workloadMetadata[2] && strings.ToLower(workloadKind) == workloadMetadata[1] {
 			podLabels = pod.Labels
@@ -133,15 +133,13 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 		}
 	} else {
 		internalPeer = InternalPeer{
-		Workload:        p.Internal.Workload,
-		PodLabels:       podLabels,
-		NamespaceLabels: namespaceLabels,
-		Namespace:       workloadMetadata[0],
-		Pods:            podsNetworking,
+			Workload:        p.Internal.Workload,
+			PodLabels:       podLabels,
+			NamespaceLabels: namespaceLabels,
+			Namespace:       workloadMetadata[0],
+			Pods:            podsNetworking,
 		}
 	}
-
-	
 
 	TranslatedPeer := TrafficPeer{
 		Internal: &internalPeer,
@@ -166,7 +164,7 @@ func DeploymentsToTrafficPeers() []TrafficPeer {
 		}
 		for _, deployment := range kubeDeployments {
 			tmpInternalPeer := InternalPeer{
-				Workload: namespace.Name+"/deployment/"+deployment.Name,
+				Workload: namespace.Name + "/deployment/" + deployment.Name,
 			}
 			tmpPeer := TrafficPeer{
 				Internal: &tmpInternalPeer,
@@ -175,7 +173,7 @@ func DeploymentsToTrafficPeers() []TrafficPeer {
 			if tmpPeerTranslated.Internal.Workload != "" {
 				deploymentPeers = append(deploymentPeers, tmpPeerTranslated)
 			}
-			
+
 		}
 
 	}
@@ -200,7 +198,7 @@ func DaemonSetsToTrafficPeers() []TrafficPeer {
 		}
 		for _, daemonSet := range kubeDaemonSets {
 			tmpInternalPeer := InternalPeer{
-				Workload: namespace.Name+"/daemonset/"+daemonSet.Name,
+				Workload: namespace.Name + "/daemonset/" + daemonSet.Name,
 			}
 			tmpPeer := TrafficPeer{
 				Internal: &tmpInternalPeer,
@@ -233,7 +231,7 @@ func StatefulSetsToTrafficPeers() []TrafficPeer {
 		}
 		for _, statefulSet := range kubeStatefulSets {
 			tmpInternalPeer := InternalPeer{
-				Workload: namespace.Name+"/statefulset/"+statefulSet.Name,
+				Workload: namespace.Name + "/statefulset/" + statefulSet.Name,
 			}
 			tmpPeer := TrafficPeer{
 				Internal: &tmpInternalPeer,
@@ -264,13 +262,13 @@ func ReplicaSetsToTrafficPeers() []TrafficPeer {
 		if err != nil {
 			logrus.Fatalf("unable to read replicaSets from kube, ns '%s': %+v", namespace.Name, err)
 		}
-		
+
 		for _, replicaSet := range kubeReplicaSets {
 			if replicaSet.OwnerReferences != nil {
 				continue
 			} else {
 				tmpInternalPeer := InternalPeer{
-				Workload: namespace.Name+"/replicaset/"+replicaSet.Name,
+					Workload: namespace.Name + "/replicaset/" + replicaSet.Name,
 				}
 				tmpPeer := TrafficPeer{
 					Internal: &tmpInternalPeer,
@@ -279,8 +277,8 @@ func ReplicaSetsToTrafficPeers() []TrafficPeer {
 				if tmpPeerTranslated.Internal.Workload != "" {
 					replicaSetPeers = append(replicaSetPeers, tmpPeerTranslated)
 				}
-				
-			}			
+
+			}
 		}
 
 	}
@@ -308,7 +306,7 @@ func PodsToTrafficPeers() []TrafficPeer {
 				continue
 			} else {
 				tmpInternalPeer := InternalPeer{
-					Workload: namespace.Name+"/pod/"+pod.Name,
+					Workload: namespace.Name + "/pod/" + pod.Name,
 				}
 				tmpPeer := TrafficPeer{
 					Internal: &tmpInternalPeer,
@@ -324,6 +322,7 @@ func PodsToTrafficPeers() []TrafficPeer {
 
 	return podPeers
 }
+
 // Internal to cluster
 type InternalPeer struct {
 	// optional: if set, will override remaining values with information from cluster
