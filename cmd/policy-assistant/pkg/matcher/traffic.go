@@ -103,6 +103,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 			}
 			if kubeReplicaSets.OwnerReferences != nil {
 				workloadOwner = kubeReplicaSets.OwnerReferences[0].Name
+				workloadKind  = "deployment"
 			}
 			
 		} else if (workloadMetadata[1] == "daemonset" || workloadMetadata[1] == "statefulset" || workloadMetadata[1] == "replicaset") && pod.OwnerReferences != nil {
@@ -110,6 +111,7 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 			workloadKind  = pod.OwnerReferences[0].Kind
 		} else if workloadMetadata[1] == "pod" {
 			workloadOwner = pod.Name
+			workloadKind  = "pod"
 		}
 		if strings.ToLower(workloadOwner) == workloadMetadata[2] && strings.ToLower(workloadKind) == workloadMetadata[1] {
 			podLabels = pod.Labels
