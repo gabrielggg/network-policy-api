@@ -326,12 +326,12 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 				return
 			}
 			fmt.Println(string(b))
-			b, err := json.Marshal(destinationPodInfo)
+			c, err := json.Marshal(destinationPodInfo)
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
-			fmt.Println(string(b))
+			fmt.Println(string(c))
 		}
 	}
 	
