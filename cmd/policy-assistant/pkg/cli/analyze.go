@@ -69,6 +69,12 @@ type AnalyzeArgs struct {
 	ProbePath string
 
 	Timeout time.Duration
+
+	SourceWorkloadTraffic string
+
+	DestinationWorkloadTraffic string
+
+	
 }
 
 func SetupAnalyzeCommand() *cobra.Command {
