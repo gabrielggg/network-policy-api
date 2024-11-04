@@ -296,7 +296,13 @@ func shouldIncludeANPandBANP(client *kubernetes.Clientset) (bool, bool) {
 	return includeANP, includeBANP
 }
 
-func VerdictWalkthrough(policies *matcher.Policy) {
+func VerdictWalkthrough(policies *matcher.Policy, trafficPath string) {
+	if trafficPath == "" {
+		logrus.Fatalf("%+v", errors.Errorf("path to traffic file required for QueryTraffic command"))
+	}
+	allTraffics, err := json.ParseFile[[]*matcher.Traffic](trafficPath)
+	utils.DoOrDie(err)
+	
 	tableString := &strings.Builder{}
 	table := tablewriter.NewWriter(tableString)
 	table.SetAutoWrapText(false)
