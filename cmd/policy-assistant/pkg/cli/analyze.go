@@ -324,7 +324,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 	fmt.Println(string(b))
 
 	// FIXME: use pod resources from CLI arguments or JSON
-	/*podA := &matcher.TrafficPeer{
+	podA := &matcher.TrafficPeer{
 		Internal: &matcher.InternalPeer{
 			PodLabels:       map[string]string{"pod": "a"},
 			NamespaceLabels: map[string]string{"kubernetes.io/metadata.name": "demo"},
@@ -365,7 +365,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 			ResolvedPort: 81,
 			Protocol:     v1.ProtocolTCP,
 		},
-	}*/
+	}
 
 	for _, traffic := range allTraffic {
 		trafficResult := policies.IsTrafficAllowed(traffic)
