@@ -312,7 +312,7 @@ func VerdictWalkthrough(policies *matcher.Policy, trafficPath string) {
 	table.SetHeader([]string{"Traffic", "Verdict", "Ingress Walkthrough", "Egress Walkthrough"})
 
 	// FIXME: use pod resources from CLI arguments or JSON
-	podA := &matcher.TrafficPeer{
+	/*podA := &matcher.TrafficPeer{
 		Internal: &matcher.InternalPeer{
 			PodLabels:       map[string]string{"pod": "a"},
 			NamespaceLabels: map[string]string{"kubernetes.io/metadata.name": "demo"},
@@ -353,9 +353,9 @@ func VerdictWalkthrough(policies *matcher.Policy, trafficPath string) {
 			ResolvedPort: 81,
 			Protocol:     v1.ProtocolTCP,
 		},
-	}
+	}*/
 
-	for _, traffic := range allTraffics {
+	for _, traffic := range *allTraffics {
 		trafficResult := policies.IsTrafficAllowed(traffic)
 		ingressFlow := trafficResult.Ingress.Flow()
 		egressFlow := trafficResult.Egress.Flow()
