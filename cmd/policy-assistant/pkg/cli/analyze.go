@@ -355,7 +355,7 @@ func VerdictWalkthrough(policies *matcher.Policy, trafficPath string) {
 		},
 	}
 
-	for _, traffic := range allTraffic {
+	for _, traffic := range allTraffics {
 		trafficResult := policies.IsTrafficAllowed(traffic)
 		ingressFlow := trafficResult.Ingress.Flow()
 		egressFlow := trafficResult.Egress.Flow()
