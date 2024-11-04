@@ -317,14 +317,22 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 	table.SetHeader([]string{"Traffic", "Verdict", "Ingress Walkthrough", "Egress Walkthrough"})
 
 	sourceWorkloadInfo = matcher.WorkloadStringToTrafficPeer(sourceWorkloadTraffic)
-	for _, info := range sourceWorkloadInfo.Internal.Pods {
-		b, err := json.Marshal(info)
-		if err != nil {
-			fmt.Println(err)
-			return
+	destinationWorkloadInfo = matcher.WorkloadStringToTrafficPeer(destinationWorkloadTraffic)
+	for _, sourcePodInfo := range sourceWorkloadInfo.Internal.Pods {
+		for _, destinationPodInfo := range destinationWorkloadInfo.Internal.Pods {
+			b, err := json.Marshal(sourcePodInfo)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			fmt.Println(string(b))
+			b, err := json.Marshal(destinationPodInfo)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			fmt.Println(string(b))
 		}
-	fmt.Println(string(b))
-
 	}
 	
 
