@@ -299,11 +299,7 @@ func shouldIncludeANPandBANP(client *kubernetes.Clientset) (bool, bool) {
 }
 
 func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string) {
-	if trafficPath == "" {
-		logrus.Fatalf("%+v", errors.Errorf("path to traffic file required for QueryTraffic command"))
-	}
-	allTraffics, err := json.ParseFile[[]*matcher.Traffic](trafficPath)
-	utils.DoOrDie(err)
+
 	
 	tableString := &strings.Builder{}
 	table := tablewriter.NewWriter(tableString)
@@ -312,6 +308,14 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 	table.SetAutoMergeCells(true)
 
 	table.SetHeader([]string{"Traffic", "Verdict", "Ingress Walkthrough", "Egress Walkthrough"})
+
+	matcher.WorkloadStringToTrafficPeer(sourceWorkloadTraffic)
+	b, err := json.Marshal(matcher.WorkloadStringToTrafficPeer(sourceWorkloadTraffic))
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	fmt.Println(string(b))
 
 	// FIXME: use pod resources from CLI arguments or JSON
 	/*podA := &matcher.TrafficPeer{
@@ -357,7 +361,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 		},
 	}*/
 
-	for _, traffic := range *allTraffics {
+	for _, traffic := range allTraffic {
 		trafficResult := policies.IsTrafficAllowed(traffic)
 		ingressFlow := trafficResult.Ingress.Flow()
 		egressFlow := trafficResult.Egress.Flow()
