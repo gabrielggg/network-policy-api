@@ -180,12 +180,12 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 }
 
 
-func WorkloadStringToTrafficPeer() TrafficPeer {
+func WorkloadStringToTrafficPeer(workloadString string) TrafficPeer {
 	//Translates a Workload string to a TrafficPeer.
 	//var deploymentPeers []TrafficPeer
 
 	tmpInternalPeer := InternalPeer{
-		Workload: namespace.Name + "/deployment/" + deployment.Name,
+		Workload: workloadString,
 	}
 	tmpPeer := TrafficPeer{
 		Internal: &tmpInternalPeer,
