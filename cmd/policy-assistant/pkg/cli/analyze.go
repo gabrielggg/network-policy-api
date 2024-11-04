@@ -309,7 +309,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 
 	table.SetHeader([]string{"Traffic", "Verdict", "Ingress Walkthrough", "Egress Walkthrough"})
 
-	matcher.WorkloadStringToTrafficPeer(sourceWorkloadTraffic)
+	//matcher.WorkloadStringToTrafficPeer(sourceWorkloadTraffic)
 	b, err := json.Marshal(matcher.WorkloadStringToTrafficPeer(sourceWorkloadTraffic))
 		if err != nil {
 			fmt.Println(err)
