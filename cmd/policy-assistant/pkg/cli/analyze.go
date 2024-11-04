@@ -317,12 +317,16 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 	table.SetHeader([]string{"Traffic", "Verdict", "Ingress Walkthrough", "Egress Walkthrough"})
 
 	sourceWorkloadInfo = matcher.WorkloadStringToTrafficPeer(sourceWorkloadTraffic)
-	b, err := json.Marshal(sourceWorkloadInfo)
+	for _, info := range sourceWorkloadInfo.Internal.Pods {
+		b, err := json.Marshal(info)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 	fmt.Println(string(b))
+
+	}
+	
 
 	// FIXME: use pod resources from CLI arguments or JSON
 	podA := &matcher.TrafficPeer{
