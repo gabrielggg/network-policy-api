@@ -305,8 +305,8 @@ func shouldIncludeANPandBANP(client *kubernetes.Clientset) (bool, bool) {
 }
 
 func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string) {
-	var sourceWorkloadInfo TrafficPeer
-	var destinationWorkloadInfo TrafficPeer
+	var sourceWorkloadInfo matcher.TrafficPeer
+	//var destinationWorkloadInfo TrafficPeer
 	
 	tableString := &strings.Builder{}
 	table := tablewriter.NewWriter(tableString)
@@ -316,7 +316,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 
 	table.SetHeader([]string{"Traffic", "Verdict", "Ingress Walkthrough", "Egress Walkthrough"})
 
-	sourceWorkloadInfo := matcher.WorkloadStringToTrafficPeer(sourceWorkloadTraffic)
+	sourceWorkloadInfo = matcher.WorkloadStringToTrafficPeer(sourceWorkloadTraffic)
 	b, err := json.Marshal(sourceWorkloadInfo)
 		if err != nil {
 			fmt.Println(err)
