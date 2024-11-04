@@ -96,6 +96,8 @@ func SetupAnalyzeCommand() *cobra.Command {
 	command.Flags().StringVar(&args.TrafficPath, "traffic-path", "", "path to json traffic file, containing of a list of traffic objects")
 	command.Flags().StringVar(&args.ProbePath, "probe-path", "", "path to json model file for synthetic probe")
 	command.Flags().DurationVar(&args.Timeout, "kube-client-timeout", DefaultTimeout, "kube client timeout")
+	command.Flags().StringVar(&args.SourceWorkloadTraffic, "source-workload-traffic", "", "Source workload traffic Name")
+	command.Flags().StringVar(&args.DestinationWorkloadTraffic, "destination-workload-traffic", "", "Destination workload traffic Name")
 
 	return command
 }
@@ -173,7 +175,7 @@ func RunAnalyzeCommand(args *AnalyzeArgs) {
 			ProbeSyntheticConnectivity(policies, args.ProbePath, kubePods, kubeNamespaces)
 		case VerdictWalkthroughMode:
 			fmt.Println("verdict walkthrough:")
-			VerdictWalkthrough(policies, args.TrafficPath)
+			VerdictWalkthrough(policies, args.SourceWorkloadTraffic, args.DestinationWorkloadTraffic)
 		default:
 			panic(errors.Errorf("unrecognized mode %s", mode))
 		}
@@ -296,7 +298,7 @@ func shouldIncludeANPandBANP(client *kubernetes.Clientset) (bool, bool) {
 	return includeANP, includeBANP
 }
 
-func VerdictWalkthrough(policies *matcher.Policy, trafficPath string) {
+func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string) {
 	if trafficPath == "" {
 		logrus.Fatalf("%+v", errors.Errorf("path to traffic file required for QueryTraffic command"))
 	}
