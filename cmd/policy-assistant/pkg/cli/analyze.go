@@ -173,7 +173,7 @@ func RunAnalyzeCommand(args *AnalyzeArgs) {
 			ProbeSyntheticConnectivity(policies, args.ProbePath, kubePods, kubeNamespaces)
 		case VerdictWalkthroughMode:
 			fmt.Println("verdict walkthrough:")
-			VerdictWalkthrough(policies)
+			VerdictWalkthrough(policies, args.TrafficPath)
 		default:
 			panic(errors.Errorf("unrecognized mode %s", mode))
 		}
