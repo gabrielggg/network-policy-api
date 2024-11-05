@@ -109,7 +109,7 @@ func SetupAnalyzeCommand() *cobra.Command {
 	command.Flags().StringVar(&args.SourceWorkloadTraffic, "source-workload-traffic", "", "Source workload traffic in this form namespace/workloadType/workloadName")
 	command.Flags().StringVar(&args.DestinationWorkloadTraffic, "destination-workload-traffic", "", "Destination workload traffic Name in this form namespace/workloadType/workloadName")
 	command.Flags().IntVar(&args.Port, "port", 80, "port used for testing network policies")
-	command.Flags().ProtocolVar(&args.Protocol, "protocol", v1.ProtocolTCP, "protocol used for testing network policies")
+	command.Flags().Var(&args.Protocol, "protocol", v1.ProtocolTCP, "protocol used for testing network policies")
 
 	return command
 }
