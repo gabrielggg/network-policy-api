@@ -76,7 +76,7 @@ type AnalyzeArgs struct {
 
 	Port int
 
-	Protocol "k8s.io/api/core/v1".Protocol
+	Protocol v1.Protocol
 
 	
 }
