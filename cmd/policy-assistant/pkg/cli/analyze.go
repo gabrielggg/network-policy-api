@@ -324,12 +324,11 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 
 	sourceWorkloadInfo = matcher.WorkloadStringToTrafficPeer(sourceWorkloadTraffic)
 	destinationWorkloadInfo = matcher.WorkloadStringToTrafficPeer(destinationWorkloadTraffic)
-	b, err := json.Marshal(destinationWorkloadInfo)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			fmt.Println(string(b))
+
+	if sourceWorkloadInfo.Internal.Pods[0].IP == "" || destinationWorkloadInfo.Internal.Pods[0].IP == "" {
+		return "workload not found"
+	}
+
 	//no need to iterate all the pods because testing just one pod of each deployment does the trick
 	/*for _, sourcePodInfo := range sourceWorkloadInfo.Internal.Pods {
 		for _, destinationPodInfo := range destinationWorkloadInfo.Internal.Pods {
