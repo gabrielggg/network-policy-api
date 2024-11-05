@@ -318,7 +318,8 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 
 	sourceWorkloadInfo = matcher.WorkloadStringToTrafficPeer(sourceWorkloadTraffic)
 	destinationWorkloadInfo = matcher.WorkloadStringToTrafficPeer(destinationWorkloadTraffic)
-	for _, sourcePodInfo := range sourceWorkloadInfo.Internal.Pods {
+	//no need to iterate all the pods because testing just one pod of each deployment does the trick
+	/*for _, sourcePodInfo := range sourceWorkloadInfo.Internal.Pods {
 		for _, destinationPodInfo := range destinationWorkloadInfo.Internal.Pods {
 			b, err := json.Marshal(sourcePodInfo)
 			if err != nil {
@@ -333,32 +334,41 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 			}
 			fmt.Println(string(c))
 		}
-	}
+	}*/
 
 	b, err := json.Marshal(sourceWorkloadInfo.Internal.Pods[0])
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			fmt.Println(string(b))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(string(b))
+	
+	c, err := json.Marshal(destinationWorkloadInfo.Internal.Pods[0])
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(string(c))
 	
 
 	// FIXME: use pod resources from CLI arguments or JSON
 	podA := &matcher.TrafficPeer{
 		Internal: &matcher.InternalPeer{
-			PodLabels:       map[string]string{"pod": "a"},
-			NamespaceLabels: map[string]string{"kubernetes.io/metadata.name": "demo"},
-			Namespace:       "demo",
+			PodLabels:       sourceWorkloadInfo.Internal.PodLabels,
+			NamespaceLabels: sourceWorkloadInfo.Internal.NamespaceLabels,
+			Namespace:       sourceWorkloadInfo.Internal.Namespace,
+			Workload:        sourceWorkloadInfo.Internal.Workload,
 		},
-		IP: "10.0.0.4",
+		IP: sourceWorkloadInfo.Internal.Pods[0].IP,
 	}
 	podB := &matcher.TrafficPeer{
 		Internal: &matcher.InternalPeer{
-			PodLabels:       map[string]string{"pod": "b"},
-			NamespaceLabels: map[string]string{"kubernetes.io/metadata.name": "demo"},
-			Namespace:       "demo",
+			PodLabels:       destinationWorkloadInfo.Internal.PodLabels,
+			NamespaceLabels: destinationWorkloadInfo.Internal.NamespaceLabels,
+			Namespace:       destinationWorkloadInfo.Internal.Namespace,
+			Workload:        destinationWorkloadInfo.Internal.Workload,
 		},
-		IP: "10.0.0.5",
+		IP: destinationWorkloadInfo.Internal.Pods[0].IP,
 	}
 	allTraffic := []*matcher.Traffic{
 		{
