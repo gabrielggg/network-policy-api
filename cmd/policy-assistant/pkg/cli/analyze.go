@@ -76,7 +76,7 @@ type AnalyzeArgs struct {
 
 	Port int
 
-	Protocol v1.Protocol
+	Protocol string
 
 	
 }
@@ -109,7 +109,7 @@ func SetupAnalyzeCommand() *cobra.Command {
 	command.Flags().StringVar(&args.SourceWorkloadTraffic, "source-workload-traffic", "", "Source workload traffic in this form namespace/workloadType/workloadName")
 	command.Flags().StringVar(&args.DestinationWorkloadTraffic, "destination-workload-traffic", "", "Destination workload traffic Name in this form namespace/workloadType/workloadName")
 	command.Flags().IntVar(&args.Port, "port", 80, "port used for testing network policies")
-	command.Flags().Var(&args.Protocol, "protocol", "protocol used for testing network policies")
+	command.Flags().StringVar(&args.Protocol, "protocol", "v1.ProtocolTCP", "protocol used for testing network policies")
 
 	return command
 }
@@ -310,7 +310,7 @@ func shouldIncludeANPandBANP(client *kubernetes.Clientset) (bool, bool) {
 	return includeANP, includeBANP
 }
 
-func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string, port int, protocol v1.Protocol) {
+func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string, port int, protocol string) {
 	var sourceWorkloadInfo matcher.TrafficPeer
 	var destinationWorkloadInfo matcher.TrafficPeer
 	
