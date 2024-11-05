@@ -325,7 +325,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 	sourceWorkloadInfo = matcher.WorkloadStringToTrafficPeer(sourceWorkloadTraffic)
 	destinationWorkloadInfo = matcher.WorkloadStringToTrafficPeer(destinationWorkloadTraffic)
 
-	if sourceWorkloadInfo.Internal.Pods[0].IP == "" || destinationWorkloadInfo.Internal.Pods[0].IP == "" {
+	if sourceWorkloadInfo.Internal.Pods == nil || destinationWorkloadInfo.Internal.Pods == nil {
 		return
 	}
 
