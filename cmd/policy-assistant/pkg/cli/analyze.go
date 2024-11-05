@@ -77,6 +77,8 @@ type AnalyzeArgs struct {
 	Port int
 
 	Protocol string
+
+	
 }
 
 func SetupAnalyzeCommand() *cobra.Command {
@@ -107,7 +109,7 @@ func SetupAnalyzeCommand() *cobra.Command {
 	command.Flags().StringVar(&args.SourceWorkloadTraffic, "source-workload-traffic", "", "Source workload traffic in this form namespace/workloadType/workloadName")
 	command.Flags().StringVar(&args.DestinationWorkloadTraffic, "destination-workload-traffic", "", "Destination workload traffic Name in this form namespace/workloadType/workloadName")
 	command.Flags().IntVar(&args.Port, "port", 80, "port used for testing network policies")
-	command.Flags().StringVar(&args.Protocol, "protocol", "v1.ProtocolTCP", "protocol used for testing network policies")
+	command.Flags().StringVar(&args.Protocol, "protocol", "TCP", "protocol used for testing network policies")
 
 	return command
 }
@@ -312,6 +314,10 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 	var sourceWorkloadInfo matcher.TrafficPeer
 	var destinationWorkloadInfo matcher.TrafficPeer
 
+	if protocol != "TCP" && protocol != "UDP" && protocol != "SCTP" {
+		logrus.Fatalf("Bad Protocol Value: protocols supported are TCP, UDP and SCTP")
+	}
+	
 	tableString := &strings.Builder{}
 	table := tablewriter.NewWriter(tableString)
 	table.SetAutoWrapText(false)
@@ -322,6 +328,11 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 
 	sourceWorkloadInfo = matcher.WorkloadStringToTrafficPeer(sourceWorkloadTraffic)
 	destinationWorkloadInfo = matcher.WorkloadStringToTrafficPeer(destinationWorkloadTraffic)
+
+	if sourceWorkloadInfo.Internal.Pods == nil || destinationWorkloadInfo.Internal.Pods == nil {
+		return
+	}
+
 	//no need to iterate all the pods because testing just one pod of each deployment does the trick
 	/*for _, sourcePodInfo := range sourceWorkloadInfo.Internal.Pods {
 		for _, destinationPodInfo := range destinationWorkloadInfo.Internal.Pods {
