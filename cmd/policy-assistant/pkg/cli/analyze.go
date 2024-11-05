@@ -74,9 +74,9 @@ type AnalyzeArgs struct {
 
 	DestinationWorkloadTraffic string
 
-	Port string
+	Port int
 
-	Protocol string
+	Protocol "k8s.io/api/core/v1".Protocol
 
 	
 }
