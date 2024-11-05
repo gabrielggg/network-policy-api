@@ -108,7 +108,7 @@ func SetupAnalyzeCommand() *cobra.Command {
 	command.Flags().DurationVar(&args.Timeout, "kube-client-timeout", DefaultTimeout, "kube client timeout")
 	command.Flags().StringVar(&args.SourceWorkloadTraffic, "source-workload-traffic", "", "Source workload traffic in this form namespace/workloadType/workloadName")
 	command.Flags().StringVar(&args.DestinationWorkloadTraffic, "destination-workload-traffic", "", "Destination workload traffic Name in this form namespace/workloadType/workloadName")
-	command.Flags().StringVar(&args.Port, "port", "", "port used for testing network policies")
+	command.Flags().IntVar(&args.Port, "port", "", "port used for testing network policies")
 	command.Flags().StringVar(&args.Protocol, "protocol", "", "protocol used for testing network policies")
 
 	return command
