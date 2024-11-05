@@ -313,6 +313,10 @@ func shouldIncludeANPandBANP(client *kubernetes.Clientset) (bool, bool) {
 func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string, port int, protocol string) {
 	var sourceWorkloadInfo matcher.TrafficPeer
 	var destinationWorkloadInfo matcher.TrafficPeer
+
+	if protocol != "TCP" && protocol != "UDP" && protocol != "SCTP" {
+		logrus.Fatalf("Bad Protocol Value: protocols supported are TCP, UDP and SCTP")
+	}
 	
 	tableString := &strings.Builder{}
 	table := tablewriter.NewWriter(tableString)
