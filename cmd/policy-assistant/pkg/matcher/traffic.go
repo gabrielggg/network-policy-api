@@ -179,7 +179,6 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	return TranslatedPeer
 }
 
-
 func WorkloadStringToTrafficPeer(workloadString string) TrafficPeer {
 	//Translates a Workload string to a TrafficPeer.
 	//var deploymentPeers []TrafficPeer

@@ -77,8 +77,6 @@ type AnalyzeArgs struct {
 	Port int
 
 	Protocol string
-
-	
 }
 
 func SetupAnalyzeCommand() *cobra.Command {
@@ -313,7 +311,7 @@ func shouldIncludeANPandBANP(client *kubernetes.Clientset) (bool, bool) {
 func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string, port int, protocol string) {
 	var sourceWorkloadInfo matcher.TrafficPeer
 	var destinationWorkloadInfo matcher.TrafficPeer
-	
+
 	tableString := &strings.Builder{}
 	table := tablewriter.NewWriter(tableString)
 	table.SetAutoWrapText(false)
