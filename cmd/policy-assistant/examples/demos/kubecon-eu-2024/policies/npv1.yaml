@@ -8,5 +8,5 @@ spec:
     - Ingress
   podSelector:
     matchLabels:
-      pod: a
+      pod: b
   ingress: []
