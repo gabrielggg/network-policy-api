@@ -7,7 +7,7 @@ spec:
   subject:
     namespaces:
       matchLabels:
-        kubernetes.io/metadata.name: demo
+        kubernetes.io/metadata.name: default
   ingress:
   - name: "deny-81"
     action: "Deny"
