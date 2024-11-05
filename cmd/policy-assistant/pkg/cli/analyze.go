@@ -334,6 +334,13 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 			fmt.Println(string(c))
 		}
 	}
+
+	b, err := json.Marshal(sourceWorkloadInfo.Internal.Pods[0])
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			fmt.Println(string(b))
 	
 
 	// FIXME: use pod resources from CLI arguments or JSON
