@@ -74,6 +74,10 @@ type AnalyzeArgs struct {
 
 	DestinationWorkloadTraffic string
 
+	Port string
+
+	Protocol string
+
 	
 }
 
@@ -104,6 +108,8 @@ func SetupAnalyzeCommand() *cobra.Command {
 	command.Flags().DurationVar(&args.Timeout, "kube-client-timeout", DefaultTimeout, "kube client timeout")
 	command.Flags().StringVar(&args.SourceWorkloadTraffic, "source-workload-traffic", "", "Source workload traffic in this form namespace/workloadType/workloadName")
 	command.Flags().StringVar(&args.DestinationWorkloadTraffic, "destination-workload-traffic", "", "Destination workload traffic Name in this form namespace/workloadType/workloadName")
+	command.Flags().StringVar(&args.Port, "port", "", "port used for testing network policies")
+	command.Flags().StringVar(&args.Protocol, "protocol", "", "protocol used for testing network policies")
 
 	return command
 }
@@ -181,7 +187,7 @@ func RunAnalyzeCommand(args *AnalyzeArgs) {
 			ProbeSyntheticConnectivity(policies, args.ProbePath, kubePods, kubeNamespaces)
 		case VerdictWalkthroughMode:
 			fmt.Println("verdict walkthrough:")
-			VerdictWalkthrough(policies, args.SourceWorkloadTraffic, args.DestinationWorkloadTraffic)
+			VerdictWalkthrough(policies, args.SourceWorkloadTraffic, args.DestinationWorkloadTraffic, args.Port, args.Protocol)
 		default:
 			panic(errors.Errorf("unrecognized mode %s", mode))
 		}
@@ -304,7 +310,7 @@ func shouldIncludeANPandBANP(client *kubernetes.Clientset) (bool, bool) {
 	return includeANP, includeBANP
 }
 
-func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string) {
+func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string, port string, protocol string) {
 	var sourceWorkloadInfo matcher.TrafficPeer
 	var destinationWorkloadInfo matcher.TrafficPeer
 	
@@ -336,22 +342,6 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 		}
 	}*/
 
-	b, err := json.Marshal(sourceWorkloadInfo.Internal.Pods[0])
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println(string(b))
-	
-	c, err := json.Marshal(destinationWorkloadInfo.Internal.Pods[0])
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println(string(c))
-	
-
-	// FIXME: use pod resources from CLI arguments or JSON
 	podA := &matcher.TrafficPeer{
 		Internal: &matcher.InternalPeer{
 			PodLabels:       sourceWorkloadInfo.Internal.PodLabels,
@@ -374,10 +364,10 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 		{
 			Source:       podA,
 			Destination:  podB,
-			ResolvedPort: 80,
-			Protocol:     v1.ProtocolTCP,
+			ResolvedPort: port,
+			Protocol:     protocol,
 		},
-		{
+		/*{
 			Source:       podA,
 			Destination:  podB,
 			ResolvedPort: 81,
@@ -394,7 +384,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 			Destination:  podA,
 			ResolvedPort: 81,
 			Protocol:     v1.ProtocolTCP,
-		},
+		},*/
 	}
 
 	for _, traffic := range allTraffic {
