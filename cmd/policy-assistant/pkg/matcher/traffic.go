@@ -179,6 +179,25 @@ func (p *TrafficPeer) Translate() TrafficPeer {
 	return TranslatedPeer
 }
 
+
+func WorkloadStringToTrafficPeer(workloadString string) TrafficPeer {
+	//Translates a Workload string to a TrafficPeer.
+	//var deploymentPeers []TrafficPeer
+
+	tmpInternalPeer := InternalPeer{
+		Workload: workloadString,
+	}
+	tmpPeer := TrafficPeer{
+		Internal: &tmpInternalPeer,
+	}
+	tmpPeerTranslated := tmpPeer.Translate()
+	//if tmpPeerTranslated.Internal.Workload != "" {
+	//	deploymentPeers = append(deploymentPeers, tmpPeerTranslated)
+	//}
+
+	return tmpPeerTranslated
+}
+
 func DeploymentsToTrafficPeers() []TrafficPeer {
 	//Translates all pods associated with deployments to TrafficPeers.
 	var deploymentPeers []TrafficPeer
