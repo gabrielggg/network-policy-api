@@ -365,7 +365,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 			Source:       podA,
 			Destination:  podB,
 			ResolvedPort: port,
-			Protocol:     protocol,
+			Protocol:     v1.Protocol(protocol),
 		},
 		/*{
 			Source:       podA,
