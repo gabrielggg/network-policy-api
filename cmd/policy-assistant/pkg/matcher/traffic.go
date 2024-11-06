@@ -69,7 +69,7 @@ func (t *Traffic) PrettyString() string {
 		src = fmt.Sprintf("%s", t.Source.IP)
 		dst = fmt.Sprintf("%s", t.Destination.IP)
 		} else if t.Source.Internal == nil && t.Destination.Internal != nil {
-			if t.Destination.Internal.Workload != nil {
+			if t.Destination.Internal.Workload != "" {
 				src = fmt.Sprintf("%s", t.Source.IP)
 				dst := t.Destination.Internal.Workload
 				if dst == "" {
@@ -88,7 +88,7 @@ func (t *Traffic) PrettyString() string {
 
 			}
 		} else if t.Source.Internal != nil && t.Destination.Internal == nil {
-			if t.Source.Internal.Workload != nil {
+			if t.Source.Internal.Workload != "" {
 				dst = fmt.Sprintf("%s", t.Destination.IP)
 				src := t.Source.Internal.Workload
 				if src == "" {
@@ -107,7 +107,7 @@ func (t *Traffic) PrettyString() string {
 
 			}
 		} else {
-			if t.Source.Internal.Workload != nil && t.Destination.Internal.Workload != nil {
+			if t.Source.Internal.Workload != "" && t.Destination.Internal.Workload != "" {
 				src := t.Source.Internal.Workload
 				if src == "" {
 					if t.Source.Internal == nil {
@@ -125,7 +125,7 @@ func (t *Traffic) PrettyString() string {
 					dst = fmt.Sprintf("%s/%s", t.Destination.Internal.Namespace, labelsToStringSlim(t.Destination.Internal.PodLabels))
 				}
 
-			} else if t.Source.Internal.Workload != nil && t.Destination.Internal.Workload == nil {
+			} else if t.Source.Internal.Workload != "" && t.Destination.Internal.Workload == nil {
 				src := t.Source.Internal.Workload
 				if src == "" {
 					if t.Source.Internal == nil {
@@ -137,7 +137,7 @@ func (t *Traffic) PrettyString() string {
 				dst = fmt.Sprintf("%s/%s", t.Destination.Internal.Namespace, labelsToStringSlim(t.Destination.Internal.PodLabels))
 				
 
-			} else if t.Source.Internal.Workload == nil && t.Destination.Internal.Workload != nil {
+			} else if t.Source.Internal.Workload == nil && t.Destination.Internal.Workload != "" {
 				dst := t.Destination.Internal.Workload
 				if dst == "" {
 					if t.Destination.Internal == nil {
