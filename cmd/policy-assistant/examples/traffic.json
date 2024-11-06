@@ -74,13 +74,13 @@
   },{
     "Source": {
       "Internal": {
-        "Workload": {"daemonset": "fluentd-elasticsearch"},
+        "Workload": "kube-system/daemonset/fluentd-elasticsearch",
         "Namespace": "kube-system"
       }
     },
     "Destination": {
       "Internal": {
-        "Workload": {"deployment": "nginx-deployment2"},
+        "Workload": "default/deployment/nginx-deployment2",
         "Namespace": "default"
       }
     },
@@ -90,7 +90,7 @@
   },{
     "Source": {
       "Internal": {
-        "Workload": {"daemonset": "fluentd-elasticsearch"},
+        "Workload": "kube-system/daemonset/fluentd-elasticsearch",
         "Namespace": "kube-system"
       }
     },
@@ -116,7 +116,7 @@
     },
     "Destination": {
       "Internal": {
-        "Workload": {"deployment": "nginx-deployment2"},
+        "Workload": "default/deployment/nginx-deployment2",
         "Namespace": "default"
       }
     },
@@ -129,7 +129,7 @@
     },
     "Destination": {
       "Internal": {
-        "Workload": {"deployment": "nginx-deployment2"},
+        "Workload": "default/deployment/nginx-deployment2",
         "Namespace": "default"
       }
     },
@@ -139,7 +139,7 @@
   },{
     "Source": {
       "Internal": {
-        "Workload": {"deployment": "nginx-deployment2"},
+        "Workload": "default/deployment/nginx-deployment2",
         "Namespace": "default"
       }    
     },
