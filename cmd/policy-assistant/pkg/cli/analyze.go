@@ -310,9 +310,50 @@ func shouldIncludeANPandBANP(client *kubernetes.Clientset) (bool, bool) {
 	return includeANP, includeBANP
 }
 
-func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string, port int, protocol string) {
+func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string, port int, protocol string, trafficPath string) {
 	var sourceWorkloadInfo matcher.TrafficPeer
 	var destinationWorkloadInfo matcher.TrafficPeer
+
+	if trafficPath != "" && (sourceWorkloadTraffic != "" || destinationWorkloadTraffic != "" || port != "" || protocol != "") {
+		logrus.Fatalf("%+v", errors.Errorf("If using traffic path, you can't input traffic via CLI and viceversa"))
+	}
+	allTraffics, err := json.ParseFile[[]*matcher.Traffic](trafficPath)
+	utils.DoOrDie(err)
+	for _, traffic := range *allTraffics {
+		if traffic.Source.Internal == nil && traffic.Destination.Internal == nil {
+			fmt.Printf("Traffic:\n%s\n", traffic.Table())
+			result := explainedPolicies.IsTrafficAllowed(traffic)
+			fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
+		} else if traffic.Source.Internal == nil && traffic.Destination.Internal != nil {
+			if traffic.Destination.Internal.Workload != nil {
+				TrafficIterator(explainedPolicies, traffic.Destination, traffic)
+			} else {
+				fmt.Printf("Traffic:\n%s\n", traffic.Table())
+				result := explainedPolicies.IsTrafficAllowed(traffic)
+				fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
+			}
+		} else if traffic.Source.Internal != nil && traffic.Destination.Internal == nil {
+			if traffic.Source.Internal.Workload != nil {
+				TrafficIterator(explainedPolicies, traffic.Source, traffic)
+			} else {
+				fmt.Printf("Traffic:\n%s\n", traffic.Table())
+				result := explainedPolicies.IsTrafficAllowed(traffic)
+				fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
+			}
+		} else {
+			if traffic.Source.Internal.Workload != nil && traffic.Destination.Internal.Workload != nil {
+				TrafficIterator(explainedPolicies, traffic.Source, traffic)
+			} else if traffic.Source.Internal.Workload != nil && traffic.Destination.Internal.Workload == nil {
+				TrafficIterator(explainedPolicies, traffic.Source, traffic)
+			} else if traffic.Source.Internal.Workload == nil && traffic.Destination.Internal.Workload != nil {
+				TrafficIterator(explainedPolicies, traffic.Destination, traffic)
+			} else {
+				fmt.Printf("Traffic:\n%s\n", traffic.Table())
+				result := explainedPolicies.IsTrafficAllowed(traffic)
+				fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
+			}
+		}
+	}
 
 	if protocol != "TCP" && protocol != "UDP" && protocol != "SCTP" {
 		logrus.Fatalf("Bad Protocol Value: protocols supported are TCP, UDP and SCTP")
