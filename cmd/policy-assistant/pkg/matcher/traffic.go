@@ -58,10 +58,63 @@ func labelsToString(labels map[string]string) string {
 	return strings.Join(slice.Map(format, slice.Sort(maps.Keys(labels))), "\n")
 }
 
-func (t *Traffic) PrettyString() string {
+func (traffic *Traffic) PrettyString() string {
 	if t == nil || t.Source == nil || t.Destination == nil {
 		return "<undefined>"
 	}
+
+	if traffic.Source.Internal == nil && traffic.Destination.Internal == nil {
+		src = fmt.Sprintf("%s", t.Source.IP)
+		dst = fmt.Sprintf("%s", t.Destination.IP)
+		} else if traffic.Source.Internal == nil && traffic.Destination.Internal != nil {
+			if traffic.Destination.Internal.Workload != nil {
+				src = fmt.Sprintf("%s", t.Source.IP)
+				dst := t.Destination.Internal.Workload
+				if dst == "" {
+					if t.Destination.Internal == nil {
+						return "<undefined>"
+					}
+			
+					dst = fmt.Sprintf("%s/%s", t.Destination.Internal.Namespace, labelsToStringSlim(t.Destination.Internal.PodLabels))
+				}
+				
+			} else {
+				src = fmt.Sprintf("%s", t.Source.IP)
+				dst = fmt.Sprintf("%s/%s", t.Destination.Internal.Namespace, labelsToStringSlim(t.Destination.Internal.PodLabels))
+
+				
+
+			}
+		} else if traffic.Source.Internal != nil && traffic.Destination.Internal == nil {
+			if traffic.Source.Internal.Workload != nil {
+				dst = fmt.Sprintf("%s", t.Destination.IP)
+				src := t.Source.Internal.Workload
+				if src == "" {
+					if t.Source.Internal == nil {
+						return "<undefined>"
+					}
+			
+					src = fmt.Sprintf("%s/%s", t.Destination.Internal.Namespace, labelsToStringSlim(t.Destination.Internal.PodLabels))
+				}
+				
+			} else {
+				dst = fmt.Sprintf("%s", t.Source.IP)
+				src = fmt.Sprintf("%s/%s", t.Destination.Internal.Namespace, labelsToStringSlim(t.Destination.Internal.PodLabels))
+
+				
+
+			}
+		} else {
+			if traffic.Source.Internal.Workload != nil && traffic.Destination.Internal.Workload != nil {
+
+			} else if traffic.Source.Internal.Workload != nil && traffic.Destination.Internal.Workload == nil {
+
+			} else if traffic.Source.Internal.Workload == nil && traffic.Destination.Internal.Workload != nil {
+
+			} else {
+
+			}
+		}
 
 	src := t.Source.Internal.Workload
 	if src == "" {
