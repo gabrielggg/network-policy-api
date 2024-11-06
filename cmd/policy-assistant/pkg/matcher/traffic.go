@@ -71,7 +71,7 @@ func (t *Traffic) PrettyString() string {
 		} else if t.Source.Internal == nil && t.Destination.Internal != nil {
 			if t.Destination.Internal.Workload != "" {
 				src = fmt.Sprintf("%s", t.Source.IP)
-				dst := t.Destination.Internal.Workload
+				dst = t.Destination.Internal.Workload
 				if dst == "" {
 					if t.Destination.Internal == nil {
 						return "<undefined>"
@@ -90,7 +90,7 @@ func (t *Traffic) PrettyString() string {
 		} else if t.Source.Internal != nil && t.Destination.Internal == nil {
 			if t.Source.Internal.Workload != "" {
 				dst = fmt.Sprintf("%s", t.Destination.IP)
-				src := t.Source.Internal.Workload
+				src = t.Source.Internal.Workload
 				if src == "" {
 					if t.Source.Internal == nil {
 						return "<undefined>"
@@ -108,7 +108,7 @@ func (t *Traffic) PrettyString() string {
 			}
 		} else {
 			if t.Source.Internal.Workload != "" && t.Destination.Internal.Workload != "" {
-				src := t.Source.Internal.Workload
+				src = t.Source.Internal.Workload
 				if src == "" {
 					if t.Source.Internal == nil {
 						return "<undefined>"
@@ -116,7 +116,7 @@ func (t *Traffic) PrettyString() string {
 			
 					src = fmt.Sprintf("%s/%s", t.Source.Internal.Namespace, labelsToStringSlim(t.Source.Internal.PodLabels))
 				}
-				dst := t.Destination.Internal.Workload
+				dst = t.Destination.Internal.Workload
 				if dst == "" {
 					if t.Destination.Internal == nil {
 						return "<undefined>"
@@ -126,7 +126,7 @@ func (t *Traffic) PrettyString() string {
 				}
 
 			} else if t.Source.Internal.Workload != "" && t.Destination.Internal.Workload == "" {
-				src := t.Source.Internal.Workload
+				src = t.Source.Internal.Workload
 				if src == "" {
 					if t.Source.Internal == nil {
 						return "<undefined>"
@@ -138,7 +138,7 @@ func (t *Traffic) PrettyString() string {
 				
 
 			} else if t.Source.Internal.Workload == "" && t.Destination.Internal.Workload != "" {
-				dst := t.Destination.Internal.Workload
+				dst = t.Destination.Internal.Workload
 				if dst == "" {
 					if t.Destination.Internal == nil {
 						return "<undefined>"
