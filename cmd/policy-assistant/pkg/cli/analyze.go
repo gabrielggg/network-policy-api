@@ -553,13 +553,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 		logrus.Fatalf("Bad Protocol Value: protocols supported are TCP, UDP and SCTP")
 	}
 	
-	tableString := &strings.Builder{}
-	table := tablewriter.NewWriter(tableString)
-	table.SetAutoWrapText(false)
-	table.SetRowLine(true)
-	table.SetAutoMergeCells(true)
-
-	table.SetHeader([]string{"Traffic", "Verdict", "Ingress Walkthrough", "Egress Walkthrough"})
+	
 
 	sourceWorkloadInfo = matcher.WorkloadStringToTrafficPeer(sourceWorkloadTraffic)
 	destinationWorkloadInfo = matcher.WorkloadStringToTrafficPeer(destinationWorkloadTraffic)
@@ -596,6 +590,14 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 		},
 	}
 	}
+	
+	tableString := &strings.Builder{}
+	table := tablewriter.NewWriter(tableString)
+	table.SetAutoWrapText(false)
+	table.SetRowLine(true)
+	table.SetAutoMergeCells(true)
+
+	table.SetHeader([]string{"Traffic", "Verdict", "Ingress Walkthrough", "Egress Walkthrough"})
 	for _, traffic := range allTraffic {
 		trafficResult := policies.IsTrafficAllowed(traffic)
 		ingressFlow := trafficResult.Ingress.Flow()
