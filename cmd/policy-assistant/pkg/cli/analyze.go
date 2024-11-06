@@ -587,7 +587,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 		},
 		IP: destinationWorkloadInfo.Internal.Pods[0].IP,
 	}
-	allTraffic := []*matcher.Traffic{
+	allTraffic = []*matcher.Traffic{
 		{
 			Source:       podA,
 			Destination:  podB,
