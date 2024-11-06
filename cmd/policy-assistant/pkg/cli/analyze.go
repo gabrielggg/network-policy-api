@@ -517,9 +517,31 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 				}
 				allTraffic = append(allTraffic, &allTrafficTmp)
 			} else {
-				fmt.Printf("Traffic:\n%s\n", traffic.Table())
-				result := explainedPolicies.IsTrafficAllowed(traffic)
-				fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
+				podA := &matcher.TrafficPeer{
+					Internal: &matcher.InternalPeer{
+						PodLabels:       traffic.Source.Internal.PodLabels,
+						NamespaceLabels: traffic.Source.Internal.NamespaceLabels,
+						Namespace:       traffic.Source.Internal.Namespace,
+					},
+					IP: traffic.Source.IP,
+				}
+				podB := &matcher.TrafficPeer{
+					Internal: &matcher.InternalPeer{
+						PodLabels:       traffic.Destination.Internal.PodLabels,
+						NamespaceLabels: traffic.Destination.Internal.NamespaceLabels,
+						Namespace:       traffic.Destination.Internal.Namespace,
+					},
+					IP: traffic.Destination.IP,
+				}
+				allTrafficTmp := []*matcher.Traffic{
+					{
+						Source:       podA,
+						Destination:  podB,
+						ResolvedPort: traffic.ResolvedPort,
+						Protocol:     traffic.Protocol,
+					},
+				}
+				allTraffic = append(allTraffic, &allTrafficTmp)
 			}
 		}
 	}
