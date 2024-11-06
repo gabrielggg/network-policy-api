@@ -77,8 +77,6 @@ type AnalyzeArgs struct {
 	Port int
 
 	Protocol string
-
-	
 }
 
 func SetupAnalyzeCommand() *cobra.Command {
@@ -108,8 +106,8 @@ func SetupAnalyzeCommand() *cobra.Command {
 	command.Flags().DurationVar(&args.Timeout, "kube-client-timeout", DefaultTimeout, "kube client timeout")
 	command.Flags().StringVar(&args.SourceWorkloadTraffic, "source-workload-traffic", "", "Source workload traffic in this form namespace/workloadType/workloadName")
 	command.Flags().StringVar(&args.DestinationWorkloadTraffic, "destination-workload-traffic", "", "Destination workload traffic Name in this form namespace/workloadType/workloadName")
-	command.Flags().IntVar(&args.Port, "port", 80, "port used for testing network policies")
-	command.Flags().StringVar(&args.Protocol, "protocol", "TCP", "protocol used for testing network policies")
+	command.Flags().IntVar(&args.Port, "port", 0, "port used for testing network policies")
+	command.Flags().StringVar(&args.Protocol, "protocol", "", "protocol used for testing network policies")
 
 	return command
 }
@@ -187,7 +185,7 @@ func RunAnalyzeCommand(args *AnalyzeArgs) {
 			ProbeSyntheticConnectivity(policies, args.ProbePath, kubePods, kubeNamespaces)
 		case VerdictWalkthroughMode:
 			fmt.Println("verdict walkthrough:")
-			VerdictWalkthrough(policies, args.SourceWorkloadTraffic, args.DestinationWorkloadTraffic, args.Port, args.Protocol)
+			VerdictWalkthrough(policies, args.SourceWorkloadTraffic, args.DestinationWorkloadTraffic, args.Port, args.Protocol, args.TrafficPath)
 		default:
 			panic(errors.Errorf("unrecognized mode %s", mode))
 		}
@@ -310,14 +308,284 @@ func shouldIncludeANPandBANP(client *kubernetes.Clientset) (bool, bool) {
 	return includeANP, includeBANP
 }
 
-func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string, port int, protocol string) {
+func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string, port int, protocol string, trafficPath string) {
 	var sourceWorkloadInfo matcher.TrafficPeer
 	var destinationWorkloadInfo matcher.TrafficPeer
+	var allTraffic []*matcher.Traffic
 
-	if protocol != "TCP" && protocol != "UDP" && protocol != "SCTP" {
-		logrus.Fatalf("Bad Protocol Value: protocols supported are TCP, UDP and SCTP")
+	if trafficPath != "" && (sourceWorkloadTraffic != "" || destinationWorkloadTraffic != "" || port != 0 || protocol != "") {
+		logrus.Fatalf("%+v", errors.Errorf("If using traffic path, you can't input traffic via CLI and viceversa"))
 	}
-	
+
+	if trafficPath != "" {
+		allTraffics, err := json.ParseFile[[]*matcher.Traffic](trafficPath)
+		utils.DoOrDie(err)
+		for _, traffic := range *allTraffics {
+			if traffic.Source.Internal == nil && traffic.Destination.Internal == nil {
+				podA := &matcher.TrafficPeer{
+					IP: traffic.Source.IP,
+				}
+				podB := &matcher.TrafficPeer{
+					IP: traffic.Destination.IP,
+				}
+				allTrafficTmp := []*matcher.Traffic{
+					{
+						Source:       podA,
+						Destination:  podB,
+						ResolvedPort: traffic.ResolvedPort,
+						Protocol:     traffic.Protocol,
+					},
+				}
+				allTraffic = append(allTraffic, allTrafficTmp[0])
+			} else if traffic.Source.Internal == nil && traffic.Destination.Internal != nil {
+				if traffic.Destination.Internal.Workload != "" {
+					podA := &matcher.TrafficPeer{
+						IP: traffic.Source.IP,
+					}
+					destinationWorkloadInfo = matcher.WorkloadStringToTrafficPeer(traffic.Destination.Internal.Workload)
+					podB := &matcher.TrafficPeer{
+						Internal: &matcher.InternalPeer{
+							PodLabels:       destinationWorkloadInfo.Internal.PodLabels,
+							NamespaceLabels: destinationWorkloadInfo.Internal.NamespaceLabels,
+							Namespace:       destinationWorkloadInfo.Internal.Namespace,
+							Workload:        destinationWorkloadInfo.Internal.Workload,
+						},
+						IP: destinationWorkloadInfo.Internal.Pods[0].IP,
+					}
+					allTrafficTmp := []*matcher.Traffic{
+						{
+							Source:       podA,
+							Destination:  podB,
+							ResolvedPort: traffic.ResolvedPort,
+							Protocol:     traffic.Protocol,
+						},
+					}
+					allTraffic = append(allTraffic, allTrafficTmp[0])
+				} else {
+					podA := &matcher.TrafficPeer{
+						IP: traffic.Source.IP,
+					}
+					podB := &matcher.TrafficPeer{
+						Internal: &matcher.InternalPeer{
+							PodLabels:       traffic.Destination.Internal.PodLabels,
+							NamespaceLabels: traffic.Destination.Internal.NamespaceLabels,
+							Namespace:       traffic.Destination.Internal.Namespace,
+						},
+						IP: traffic.Destination.IP,
+					}
+					allTrafficTmp := []*matcher.Traffic{
+						{
+							Source:       podA,
+							Destination:  podB,
+							ResolvedPort: traffic.ResolvedPort,
+							Protocol:     traffic.Protocol,
+						},
+					}
+					allTraffic = append(allTraffic, allTrafficTmp[0])
+				}
+			} else if traffic.Source.Internal != nil && traffic.Destination.Internal == nil {
+				if traffic.Source.Internal.Workload != "" {
+					podB := &matcher.TrafficPeer{
+						IP: traffic.Destination.IP,
+					}
+					sourceWorkloadInfo = matcher.WorkloadStringToTrafficPeer(traffic.Source.Internal.Workload)
+					podA := &matcher.TrafficPeer{
+						Internal: &matcher.InternalPeer{
+							PodLabels:       sourceWorkloadInfo.Internal.PodLabels,
+							NamespaceLabels: sourceWorkloadInfo.Internal.NamespaceLabels,
+							Namespace:       sourceWorkloadInfo.Internal.Namespace,
+							Workload:        sourceWorkloadInfo.Internal.Workload,
+						},
+						IP: sourceWorkloadInfo.Internal.Pods[0].IP,
+					}
+					allTrafficTmp := []*matcher.Traffic{
+						{
+							Source:       podA,
+							Destination:  podB,
+							ResolvedPort: traffic.ResolvedPort,
+							Protocol:     traffic.Protocol,
+						},
+					}
+					allTraffic = append(allTraffic, allTrafficTmp[0])
+				} else {
+					podB := &matcher.TrafficPeer{
+						IP: traffic.Destination.IP,
+					}
+					podA := &matcher.TrafficPeer{
+						Internal: &matcher.InternalPeer{
+							PodLabels:       traffic.Source.Internal.PodLabels,
+							NamespaceLabels: traffic.Source.Internal.NamespaceLabels,
+							Namespace:       traffic.Source.Internal.Namespace,
+						},
+						IP: traffic.Source.IP,
+					}
+					allTrafficTmp := []*matcher.Traffic{
+						{
+							Source:       podA,
+							Destination:  podB,
+							ResolvedPort: traffic.ResolvedPort,
+							Protocol:     traffic.Protocol,
+						},
+					}
+					allTraffic = append(allTraffic, allTrafficTmp[0])
+				}
+			} else {
+				if traffic.Source.Internal.Workload != "" && traffic.Destination.Internal.Workload != "" {
+					sourceWorkloadInfo = matcher.WorkloadStringToTrafficPeer(traffic.Source.Internal.Workload)
+					destinationWorkloadInfo = matcher.WorkloadStringToTrafficPeer(traffic.Destination.Internal.Workload)
+					podA := &matcher.TrafficPeer{
+						Internal: &matcher.InternalPeer{
+							PodLabels:       sourceWorkloadInfo.Internal.PodLabels,
+							NamespaceLabels: sourceWorkloadInfo.Internal.NamespaceLabels,
+							Namespace:       sourceWorkloadInfo.Internal.Namespace,
+							Workload:        sourceWorkloadInfo.Internal.Workload,
+						},
+						IP: sourceWorkloadInfo.Internal.Pods[0].IP,
+					}
+					podB := &matcher.TrafficPeer{
+						Internal: &matcher.InternalPeer{
+							PodLabels:       destinationWorkloadInfo.Internal.PodLabels,
+							NamespaceLabels: destinationWorkloadInfo.Internal.NamespaceLabels,
+							Namespace:       destinationWorkloadInfo.Internal.Namespace,
+							Workload:        destinationWorkloadInfo.Internal.Workload,
+						},
+						IP: destinationWorkloadInfo.Internal.Pods[0].IP,
+					}
+					allTrafficTmp := []*matcher.Traffic{
+						{
+							Source:       podA,
+							Destination:  podB,
+							ResolvedPort: traffic.ResolvedPort,
+							Protocol:     traffic.Protocol,
+						},
+					}
+					allTraffic = append(allTraffic, allTrafficTmp[0])
+				} else if traffic.Source.Internal.Workload != "" && traffic.Destination.Internal.Workload == "" {
+					sourceWorkloadInfo = matcher.WorkloadStringToTrafficPeer(traffic.Source.Internal.Workload)
+					podA := &matcher.TrafficPeer{
+						Internal: &matcher.InternalPeer{
+							PodLabels:       sourceWorkloadInfo.Internal.PodLabels,
+							NamespaceLabels: sourceWorkloadInfo.Internal.NamespaceLabels,
+							Namespace:       sourceWorkloadInfo.Internal.Namespace,
+							Workload:        sourceWorkloadInfo.Internal.Workload,
+						},
+						IP: sourceWorkloadInfo.Internal.Pods[0].IP,
+					}
+					podB := &matcher.TrafficPeer{
+						Internal: &matcher.InternalPeer{
+							PodLabels:       traffic.Destination.Internal.PodLabels,
+							NamespaceLabels: traffic.Destination.Internal.NamespaceLabels,
+							Namespace:       traffic.Destination.Internal.Namespace,
+						},
+						IP: traffic.Destination.IP,
+					}
+					allTrafficTmp := []*matcher.Traffic{
+						{
+							Source:       podA,
+							Destination:  podB,
+							ResolvedPort: traffic.ResolvedPort,
+							Protocol:     traffic.Protocol,
+						},
+					}
+					allTraffic = append(allTraffic, allTrafficTmp[0])
+				} else if traffic.Source.Internal.Workload == "" && traffic.Destination.Internal.Workload != "" {
+					destinationWorkloadInfo = matcher.WorkloadStringToTrafficPeer(traffic.Destination.Internal.Workload)
+					podB := &matcher.TrafficPeer{
+						Internal: &matcher.InternalPeer{
+							PodLabels:       destinationWorkloadInfo.Internal.PodLabels,
+							NamespaceLabels: destinationWorkloadInfo.Internal.NamespaceLabels,
+							Namespace:       destinationWorkloadInfo.Internal.Namespace,
+							Workload:        destinationWorkloadInfo.Internal.Workload,
+						},
+						IP: destinationWorkloadInfo.Internal.Pods[0].IP,
+					}
+					podA := &matcher.TrafficPeer{
+						Internal: &matcher.InternalPeer{
+							PodLabels:       traffic.Source.Internal.PodLabels,
+							NamespaceLabels: traffic.Source.Internal.NamespaceLabels,
+							Namespace:       traffic.Source.Internal.Namespace,
+						},
+						IP: traffic.Source.IP,
+					}
+					allTrafficTmp := []*matcher.Traffic{
+						{
+							Source:       podA,
+							Destination:  podB,
+							ResolvedPort: traffic.ResolvedPort,
+							Protocol:     traffic.Protocol,
+						},
+					}
+					allTraffic = append(allTraffic, allTrafficTmp[0])
+				} else {
+					podA := &matcher.TrafficPeer{
+						Internal: &matcher.InternalPeer{
+							PodLabels:       traffic.Source.Internal.PodLabels,
+							NamespaceLabels: traffic.Source.Internal.NamespaceLabels,
+							Namespace:       traffic.Source.Internal.Namespace,
+						},
+						IP: traffic.Source.IP,
+					}
+					podB := &matcher.TrafficPeer{
+						Internal: &matcher.InternalPeer{
+							PodLabels:       traffic.Destination.Internal.PodLabels,
+							NamespaceLabels: traffic.Destination.Internal.NamespaceLabels,
+							Namespace:       traffic.Destination.Internal.Namespace,
+						},
+						IP: traffic.Destination.IP,
+					}
+					allTrafficTmp := []*matcher.Traffic{
+						{
+							Source:       podA,
+							Destination:  podB,
+							ResolvedPort: traffic.ResolvedPort,
+							Protocol:     traffic.Protocol,
+						},
+					}
+					allTraffic = append(allTraffic, allTrafficTmp[0])
+				}
+			}
+		}
+	} else {
+
+		if protocol != "TCP" && protocol != "UDP" && protocol != "SCTP" {
+			logrus.Fatalf("Bad Protocol Value: protocols supported are TCP, UDP and SCTP")
+		}
+
+		sourceWorkloadInfo = matcher.WorkloadStringToTrafficPeer(sourceWorkloadTraffic)
+		destinationWorkloadInfo = matcher.WorkloadStringToTrafficPeer(destinationWorkloadTraffic)
+
+		if sourceWorkloadInfo.Internal.Pods == nil || destinationWorkloadInfo.Internal.Pods == nil {
+			return
+		}
+
+		podA := &matcher.TrafficPeer{
+			Internal: &matcher.InternalPeer{
+				PodLabels:       sourceWorkloadInfo.Internal.PodLabels,
+				NamespaceLabels: sourceWorkloadInfo.Internal.NamespaceLabels,
+				Namespace:       sourceWorkloadInfo.Internal.Namespace,
+				Workload:        sourceWorkloadInfo.Internal.Workload,
+			},
+			IP: sourceWorkloadInfo.Internal.Pods[0].IP,
+		}
+		podB := &matcher.TrafficPeer{
+			Internal: &matcher.InternalPeer{
+				PodLabels:       destinationWorkloadInfo.Internal.PodLabels,
+				NamespaceLabels: destinationWorkloadInfo.Internal.NamespaceLabels,
+				Namespace:       destinationWorkloadInfo.Internal.Namespace,
+				Workload:        destinationWorkloadInfo.Internal.Workload,
+			},
+			IP: destinationWorkloadInfo.Internal.Pods[0].IP,
+		}
+		allTraffic = []*matcher.Traffic{
+			{
+				Source:       podA,
+				Destination:  podB,
+				ResolvedPort: port,
+				Protocol:     v1.Protocol(protocol),
+			},
+		}
+	}
+
 	tableString := &strings.Builder{}
 	table := tablewriter.NewWriter(tableString)
 	table.SetAutoWrapText(false)
@@ -325,77 +593,6 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 	table.SetAutoMergeCells(true)
 
 	table.SetHeader([]string{"Traffic", "Verdict", "Ingress Walkthrough", "Egress Walkthrough"})
-
-	sourceWorkloadInfo = matcher.WorkloadStringToTrafficPeer(sourceWorkloadTraffic)
-	destinationWorkloadInfo = matcher.WorkloadStringToTrafficPeer(destinationWorkloadTraffic)
-
-	if sourceWorkloadInfo.Internal.Pods == nil || destinationWorkloadInfo.Internal.Pods == nil {
-		return
-	}
-
-	//no need to iterate all the pods because testing just one pod of each deployment does the trick
-	/*for _, sourcePodInfo := range sourceWorkloadInfo.Internal.Pods {
-		for _, destinationPodInfo := range destinationWorkloadInfo.Internal.Pods {
-			b, err := json.Marshal(sourcePodInfo)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			fmt.Println(string(b))
-			c, err := json.Marshal(destinationPodInfo)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-			fmt.Println(string(c))
-		}
-	}*/
-
-	podA := &matcher.TrafficPeer{
-		Internal: &matcher.InternalPeer{
-			PodLabels:       sourceWorkloadInfo.Internal.PodLabels,
-			NamespaceLabels: sourceWorkloadInfo.Internal.NamespaceLabels,
-			Namespace:       sourceWorkloadInfo.Internal.Namespace,
-			Workload:        sourceWorkloadInfo.Internal.Workload,
-		},
-		IP: sourceWorkloadInfo.Internal.Pods[0].IP,
-	}
-	podB := &matcher.TrafficPeer{
-		Internal: &matcher.InternalPeer{
-			PodLabels:       destinationWorkloadInfo.Internal.PodLabels,
-			NamespaceLabels: destinationWorkloadInfo.Internal.NamespaceLabels,
-			Namespace:       destinationWorkloadInfo.Internal.Namespace,
-			Workload:        destinationWorkloadInfo.Internal.Workload,
-		},
-		IP: destinationWorkloadInfo.Internal.Pods[0].IP,
-	}
-	allTraffic := []*matcher.Traffic{
-		{
-			Source:       podA,
-			Destination:  podB,
-			ResolvedPort: port,
-			Protocol:     v1.Protocol(protocol),
-		},
-		/*{
-			Source:       podA,
-			Destination:  podB,
-			ResolvedPort: 81,
-			Protocol:     v1.ProtocolTCP,
-		},
-		{
-			Source:       podB,
-			Destination:  podA,
-			ResolvedPort: 80,
-			Protocol:     v1.ProtocolTCP,
-		},
-		{
-			Source:       podB,
-			Destination:  podA,
-			ResolvedPort: 81,
-			Protocol:     v1.ProtocolTCP,
-		},*/
-	}
-
 	for _, traffic := range allTraffic {
 		trafficResult := policies.IsTrafficAllowed(traffic)
 		ingressFlow := trafficResult.Ingress.Flow()
