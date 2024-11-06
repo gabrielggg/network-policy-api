@@ -59,6 +59,8 @@ func labelsToString(labels map[string]string) string {
 }
 
 func (t *Traffic) PrettyString() string {
+	var src string
+	var dst string
 	if t == nil || t.Source == nil || t.Destination == nil {
 		return "<undefined>"
 	}
