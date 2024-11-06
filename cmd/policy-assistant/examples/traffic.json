@@ -80,7 +80,7 @@
     },
     "Destination": {
       "Internal": {
-        "Workload": "default/deployment/nginx-deployment2",
+        "Workload": "default/deployment/aks-helloworld-one",
         "Namespace": "default"
       }
     },
