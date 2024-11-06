@@ -338,7 +338,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 						Protocol:     traffic.Protocol,
 					},
 				}
-				allTraffic = append(allTraffic, &allTrafficTmp)
+				allTraffic = append(allTraffic, &allTrafficTmp[0])
 			} else if traffic.Source.Internal == nil && traffic.Destination.Internal != nil {
 				if traffic.Destination.Internal.Workload != nil {
 					podA := &matcher.TrafficPeer{
