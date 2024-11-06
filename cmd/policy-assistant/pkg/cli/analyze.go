@@ -313,6 +313,7 @@ func shouldIncludeANPandBANP(client *kubernetes.Clientset) (bool, bool) {
 func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string, port int, protocol string, trafficPath string) {
 	var sourceWorkloadInfo matcher.TrafficPeer
 	var destinationWorkloadInfo matcher.TrafficPeer
+	var allTraffic []*matcher.Traffic
 
 	if trafficPath != "" && (sourceWorkloadTraffic != "" || destinationWorkloadTraffic != "" || port != "" || protocol != "") {
 		logrus.Fatalf("%+v", errors.Errorf("If using traffic path, you can't input traffic via CLI and viceversa"))
@@ -321,12 +322,13 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 	utils.DoOrDie(err)
 	for _, traffic := range *allTraffics {
 		if traffic.Source.Internal == nil && traffic.Destination.Internal == nil {
+			podA := &matcher.TrafficPeer{
 				IP: traffic.Source.IP,
 			}
 			podB := &matcher.TrafficPeer{
 				IP: traffic.Destination.IP,
 			}
-			allTraffic := []*matcher.Traffic{
+			allTrafficTmp := []*matcher.Traffic{
 				{
 					Source:       podA,
 					Destination:  podB,
@@ -334,13 +336,52 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 					Protocol:     traffic.Protocol,
 				},
 			}
+			allTraffic = append(allTraffic, &allTrafficTmp)
 		} else if traffic.Source.Internal == nil && traffic.Destination.Internal != nil {
 			if traffic.Destination.Internal.Workload != nil {
-				TrafficIterator(explainedPolicies, traffic.Destination, traffic)
+				podA := &matcher.TrafficPeer{
+					IP: traffic.Source.IP,
+				}
+				destinationWorkloadInfo = matcher.WorkloadStringToTrafficPeer(destinationWorkloadTraffic)
+				podB := &matcher.TrafficPeer{
+					Internal: &matcher.InternalPeer{
+						PodLabels:       destinationWorkloadInfo.Internal.PodLabels,
+						NamespaceLabels: destinationWorkloadInfo.Internal.NamespaceLabels,
+						Namespace:       destinationWorkloadInfo.Internal.Namespace,
+						Workload:        destinationWorkloadInfo.Internal.Workload,
+					},
+					IP: destinationWorkloadInfo.Internal.Pods[0].IP,
+				}
+				allTrafficTmp := []*matcher.Traffic{
+					{
+						Source:       podA,
+						Destination:  podB,
+						ResolvedPort: traffic.ResolvedPort,
+						Protocol:     traffic.Protocol,
+					},
+				}
+				allTraffic = append(allTraffic, &allTrafficTmp)
 			} else {
-				fmt.Printf("Traffic:\n%s\n", traffic.Table())
-				result := explainedPolicies.IsTrafficAllowed(traffic)
-				fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
+				podA := &matcher.TrafficPeer{
+					IP: traffic.Source.IP,
+				}
+				podB := &matcher.TrafficPeer{
+					Internal: &matcher.InternalPeer{
+						PodLabels:       traffic.Destination.Internal.PodLabels,
+						NamespaceLabels: traffic.Destination.Internal.NamespaceLabels,
+						Namespace:       traffic.Destination.Internal.Namespace,
+					},
+					IP: destinationWorkloadInfo.Internal.Pods[0].IP,
+				}
+				allTrafficTmp := []*matcher.Traffic{
+					{
+						Source:       podA,
+						Destination:  podB,
+						ResolvedPort: traffic.ResolvedPort,
+						Protocol:     traffic.Protocol,
+					},
+				}
+				allTraffic = append(allTraffic, &allTrafficTmp)
 			}
 		} else if traffic.Source.Internal != nil && traffic.Destination.Internal == nil {
 			if traffic.Source.Internal.Workload != nil {
@@ -427,24 +468,6 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 			ResolvedPort: port,
 			Protocol:     v1.Protocol(protocol),
 		},
-		/*{
-			Source:       podA,
-			Destination:  podB,
-			ResolvedPort: 81,
-			Protocol:     v1.ProtocolTCP,
-		},
-		{
-			Source:       podB,
-			Destination:  podA,
-			ResolvedPort: 80,
-			Protocol:     v1.ProtocolTCP,
-		},
-		{
-			Source:       podB,
-			Destination:  podA,
-			ResolvedPort: 81,
-			Protocol:     v1.ProtocolTCP,
-		},*/
 	}
 
 	for _, traffic := range allTraffic {
