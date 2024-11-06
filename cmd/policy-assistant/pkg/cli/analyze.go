@@ -315,7 +315,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 	var destinationWorkloadInfo matcher.TrafficPeer
 	var allTraffic []*matcher.Traffic
 
-	if trafficPath != "" && (sourceWorkloadTraffic != "" || destinationWorkloadTraffic != "" || port != "" || protocol != "") {
+	if trafficPath != "" && (sourceWorkloadTraffic != "" || destinationWorkloadTraffic != "" || string(port) != "" || protocol != "") {
 		logrus.Fatalf("%+v", errors.Errorf("If using traffic path, you can't input traffic via CLI and viceversa"))
 	}
 	
