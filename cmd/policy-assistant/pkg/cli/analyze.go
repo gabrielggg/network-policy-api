@@ -340,7 +340,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 				}
 				allTraffic = append(allTraffic, allTrafficTmp[0])
 			} else if traffic.Source.Internal == nil && traffic.Destination.Internal != nil {
-				if traffic.Destination.Internal.Workload != nil {
+				if traffic.Destination.Internal.Workload != "" {
 					podA := &matcher.TrafficPeer{
 						IP: traffic.Source.IP,
 					}
@@ -386,7 +386,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 					allTraffic = append(allTraffic, allTrafficTmp[0])
 				}
 			} else if traffic.Source.Internal != nil && traffic.Destination.Internal == nil {
-				if traffic.Source.Internal.Workload != nil {
+				if traffic.Source.Internal.Workload != "" {
 					podB := &matcher.TrafficPeer{
 						IP: traffic.Destination.IP,
 					}
@@ -432,7 +432,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 					allTraffic = append(allTraffic, allTrafficTmp[0])
 				}
 			} else {
-				if traffic.Source.Internal.Workload != nil && traffic.Destination.Internal.Workload != nil {
+				if traffic.Source.Internal.Workload != "" && traffic.Destination.Internal.Workload != "" {
 					sourceWorkloadInfo = matcher.WorkloadStringToTrafficPeer(traffic.Source.Internal.Workload)
 					destinationWorkloadInfo = matcher.WorkloadStringToTrafficPeer(traffic.Destination.Internal.Workload)
 					podA := &matcher.TrafficPeer{
@@ -462,7 +462,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 						},
 					}
 					allTraffic = append(allTraffic, allTrafficTmp[0])
-				} else if traffic.Source.Internal.Workload != nil && traffic.Destination.Internal.Workload == nil {
+				} else if traffic.Source.Internal.Workload != "" && traffic.Destination.Internal.Workload == nil {
 					sourceWorkloadInfo = matcher.WorkloadStringToTrafficPeer(traffic.Source.Internal.Workload)
 					podA := &matcher.TrafficPeer{
 						Internal: &matcher.InternalPeer{
@@ -490,7 +490,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 						},
 					}
 					allTraffic = append(allTraffic, allTrafficTmp[0])
-				} else if traffic.Source.Internal.Workload == nil && traffic.Destination.Internal.Workload != nil {
+				} else if traffic.Source.Internal.Workload == nil && traffic.Destination.Internal.Workload != "" {
 					destinationWorkloadInfo = matcher.WorkloadStringToTrafficPeer(traffic.Destination.Internal.Workload)
 					podB := &matcher.TrafficPeer{
 						Internal: &matcher.InternalPeer{
