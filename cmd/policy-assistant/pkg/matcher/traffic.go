@@ -153,23 +153,6 @@ func (t *Traffic) PrettyString() string {
 			}
 		}
 
-	src := t.Source.Internal.Workload
-	if src == "" {
-		if t.Source.Internal == nil {
-			return "<undefined>"
-		}
-
-		src = fmt.Sprintf("%s/%s", t.Source.Internal.Namespace, labelsToStringSlim(t.Source.Internal.PodLabels))
-	}
-
-	dst := t.Destination.Internal.Workload
-	if dst == "" {
-		if t.Destination.Internal == nil {
-			return "<undefined>"
-		}
-
-		dst = fmt.Sprintf("%s/%s", t.Destination.Internal.Namespace, labelsToStringSlim(t.Destination.Internal.PodLabels))
-	}
 
 	return fmt.Sprintf("%s -> %s:%d (%s)", src, dst, t.ResolvedPort, t.Protocol)
 }
