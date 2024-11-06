@@ -321,9 +321,19 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 	utils.DoOrDie(err)
 	for _, traffic := range *allTraffics {
 		if traffic.Source.Internal == nil && traffic.Destination.Internal == nil {
-			fmt.Printf("Traffic:\n%s\n", traffic.Table())
-			result := explainedPolicies.IsTrafficAllowed(traffic)
-			fmt.Printf("Is traffic allowed?\n%s\n\n\n", result.Table())
+				IP: traffic.Source.IP,
+			}
+			podB := &matcher.TrafficPeer{
+				IP: traffic.Destination.IP,
+			}
+			allTraffic := []*matcher.Traffic{
+				{
+					Source:       podA,
+					Destination:  podB,
+					ResolvedPort: traffic.ResolvedPort,
+					Protocol:     traffic.Protocol,
+				},
+			}
 		} else if traffic.Source.Internal == nil && traffic.Destination.Internal != nil {
 			if traffic.Destination.Internal.Workload != nil {
 				TrafficIterator(explainedPolicies, traffic.Destination, traffic)
