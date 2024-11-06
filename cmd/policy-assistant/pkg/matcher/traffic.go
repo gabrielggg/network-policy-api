@@ -125,7 +125,7 @@ func (t *Traffic) PrettyString() string {
 					dst = fmt.Sprintf("%s/%s", t.Destination.Internal.Namespace, labelsToStringSlim(t.Destination.Internal.PodLabels))
 				}
 
-			} else if t.Source.Internal.Workload != "" && t.Destination.Internal.Workload == nil {
+			} else if t.Source.Internal.Workload != "" && t.Destination.Internal.Workload == "" {
 				src := t.Source.Internal.Workload
 				if src == "" {
 					if t.Source.Internal == nil {
@@ -137,7 +137,7 @@ func (t *Traffic) PrettyString() string {
 				dst = fmt.Sprintf("%s/%s", t.Destination.Internal.Namespace, labelsToStringSlim(t.Destination.Internal.PodLabels))
 				
 
-			} else if t.Source.Internal.Workload == nil && t.Destination.Internal.Workload != "" {
+			} else if t.Source.Internal.Workload == "" && t.Destination.Internal.Workload != "" {
 				dst := t.Destination.Internal.Workload
 				if dst == "" {
 					if t.Destination.Internal == nil {
