@@ -187,7 +187,7 @@ func RunAnalyzeCommand(args *AnalyzeArgs) {
 			ProbeSyntheticConnectivity(policies, args.ProbePath, kubePods, kubeNamespaces)
 		case VerdictWalkthroughMode:
 			fmt.Println("verdict walkthrough:")
-			VerdictWalkthrough(policies, args.SourceWorkloadTraffic, args.DestinationWorkloadTraffic, args.Port, args.Protocol)
+			VerdictWalkthrough(policies, args.SourceWorkloadTraffic, args.DestinationWorkloadTraffic, args.Port, args.Protocol, args.TrafficPath)
 		default:
 			panic(errors.Errorf("unrecognized mode %s", mode))
 		}
