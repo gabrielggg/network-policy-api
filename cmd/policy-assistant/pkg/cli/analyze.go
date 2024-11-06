@@ -330,7 +330,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 				podB := &matcher.TrafficPeer{
 					IP: traffic.Destination.IP,
 				}
-				allTrafficTmp := matcher.Traffic{
+				allTrafficTmp := []*matcher.Traffic{
 					{
 						Source:       podA,
 						Destination:  podB,
@@ -354,7 +354,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 						},
 						IP: destinationWorkloadInfo.Internal.Pods[0].IP,
 					}
-					allTrafficTmp := matcher.Traffic{
+					allTrafficTmp := []*matcher.Traffic{
 						{
 							Source:       podA,
 							Destination:  podB,
@@ -375,7 +375,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 						},
 						IP: traffic.Destination.IP,
 					}
-					allTrafficTmp := matcher.Traffic{
+					allTrafficTmp := []*matcher.Traffic{
 						{
 							Source:       podA,
 							Destination:  podB,
@@ -400,7 +400,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 						},
 						IP: sourceWorkloadInfo.Internal.Pods[0].IP,
 					}
-					allTrafficTmp := matcher.Traffic{
+					allTrafficTmp := []*matcher.Traffic{
 						{
 							Source:       podA,
 							Destination:  podB,
@@ -421,7 +421,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 						},
 						IP: traffic.Source.IP,
 					}
-					allTrafficTmp := matcher.Traffic{
+					allTrafficTmp := []*matcher.Traffic{
 						{
 							Source:       podA,
 							Destination:  podB,
@@ -453,7 +453,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 						},
 						IP: destinationWorkloadInfo.Internal.Pods[0].IP,
 					}
-					allTrafficTmp := matcher.Traffic{
+					allTrafficTmp := []*matcher.Traffic{
 						{
 							Source:       podA,
 							Destination:  podB,
@@ -481,7 +481,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 						},
 						IP: traffic.Destination.IP,
 					}
-					allTrafficTmp := matcher.Traffic{
+					allTrafficTmp := []*matcher.Traffic{
 						{
 							Source:       podA,
 							Destination:  podB,
@@ -509,7 +509,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 						},
 						IP: traffic.Source.IP,
 					}
-					allTrafficTmp := matcher.Traffic{
+					allTrafficTmp := []*matcher.Traffic{
 						{
 							Source:       podA,
 							Destination:  podB,
@@ -535,7 +535,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 						},
 						IP: traffic.Destination.IP,
 					}
-					allTrafficTmp := matcher.Traffic{
+					allTrafficTmp := []*matcher.Traffic{
 						{
 							Source:       podA,
 							Destination:  podB,
