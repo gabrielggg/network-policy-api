@@ -110,7 +110,7 @@ func (p *TrafficPeer) IsExternal() bool {
 	return p.Internal == nil
 }
 
-func createTrafficPeer(ip string, internal *InternalPeer) *TrafficPeer {
+func CreateTrafficPeer(ip string, internal *InternalPeer) *TrafficPeer {
 		    return &TrafficPeer{
 		        IP:       ip,
 		        Internal: internal,
@@ -128,7 +128,7 @@ func createTrafficPeer(ip string, internal *InternalPeer) *TrafficPeer {
 		}
 		
 		// Helper function to get internal TrafficPeer info from workload string
-		func getInternalPeerInfo(workload string) *TrafficPeer {
+		func GetInternalPeerInfo(workload string) *TrafficPeer {
 		    if workload == "" {
 		        return nil
 		    }
