@@ -60,31 +60,31 @@ func labelsToString(labels map[string]string) string {
 
 // Helper function to generate the string for source or destination
 func (t *Traffic) formatPeer(peer *TrafficPeer) string {
-    if peer.Internal == nil {
-        return fmt.Sprintf("%s", peer.IP)
-    }
+	if peer.Internal == nil {
+		return fmt.Sprintf("%s", peer.IP)
+	}
 
-    // If there is a workload, return it
-    if peer.Internal.Workload != "" {
-        return peer.Internal.Workload
-    }
+	// If there is a workload, return it
+	if peer.Internal.Workload != "" {
+		return peer.Internal.Workload
+	}
 
-    // Otherwise, return namespace and labels
-    return fmt.Sprintf("%s/%s", peer.Internal.Namespace, labelsToStringSlim(peer.Internal.PodLabels))
+	// Otherwise, return namespace and labels
+	return fmt.Sprintf("%s/%s", peer.Internal.Namespace, labelsToStringSlim(peer.Internal.PodLabels))
 }
 
 // PrettyString refactor to reduce nested if/else blocks
 func (t *Traffic) PrettyString() string {
-    if t == nil || t.Source == nil || t.Destination == nil {
-        return "<undefined>"
-    }
+	if t == nil || t.Source == nil || t.Destination == nil {
+		return "<undefined>"
+	}
 
-    // Format source and destination peers
-    src := t.formatPeer(t.Source)
-    dst := t.formatPeer(t.Destination)
+	// Format source and destination peers
+	src := t.formatPeer(t.Source)
+	dst := t.formatPeer(t.Destination)
 
-    // If both source and destination are internal, we need to check the workload conditions
-    return fmt.Sprintf("%s -> %s:%d (%s)", src, dst, t.ResolvedPort, t.Protocol)
+	// If both source and destination are internal, we need to check the workload conditions
+	return fmt.Sprintf("%s -> %s:%d (%s)", src, dst, t.ResolvedPort, t.Protocol)
 }
 
 func labelsToStringSlim(labels map[string]string) string {
@@ -111,38 +111,38 @@ func (p *TrafficPeer) IsExternal() bool {
 }
 
 func CreateTrafficPeer(ip string, internal *InternalPeer) *TrafficPeer {
-		    return &TrafficPeer{
-		        IP:       ip,
-		        Internal: internal,
-		    }
-		}
-		
-		// Helper function to create Traffic objects
-		func CreateTraffic(source, destination *TrafficPeer, resolvedPort int, protocol string) *Traffic {
-		    return &Traffic{
-		        Source:       source,
-		        Destination:  destination,
-		        ResolvedPort: resolvedPort,
-		        Protocol:     v1.Protocol(protocol),
-		    }
-		}
-		
-		// Helper function to get internal TrafficPeer info from workload string
-		func GetInternalPeerInfo(workload string) *TrafficPeer {
-		    if workload == "" {
-		        return nil
-		    }
-		    workloadInfo := WorkloadStringToTrafficPeer(workload)
-		    return &TrafficPeer{
-		        Internal: &InternalPeer{
-		            PodLabels:       workloadInfo.Internal.PodLabels,
-		            NamespaceLabels: workloadInfo.Internal.NamespaceLabels,
-		            Namespace:       workloadInfo.Internal.Namespace,
-		            Workload:        workloadInfo.Internal.Workload,
-		        },
-		        IP: workloadInfo.Internal.Pods[0].IP,
-		    }
-		}
+	return &TrafficPeer{
+		IP:       ip,
+		Internal: internal,
+	}
+}
+
+// Helper function to create Traffic objects
+func CreateTraffic(source, destination *TrafficPeer, resolvedPort int, protocol string) *Traffic {
+	return &Traffic{
+		Source:       source,
+		Destination:  destination,
+		ResolvedPort: resolvedPort,
+		Protocol:     v1.Protocol(protocol),
+	}
+}
+
+// Helper function to get internal TrafficPeer info from workload string
+func GetInternalPeerInfo(workload string) *TrafficPeer {
+	if workload == "" {
+		return nil
+	}
+	workloadInfo := WorkloadStringToTrafficPeer(workload)
+	return &TrafficPeer{
+		Internal: &InternalPeer{
+			PodLabels:       workloadInfo.Internal.PodLabels,
+			NamespaceLabels: workloadInfo.Internal.NamespaceLabels,
+			Namespace:       workloadInfo.Internal.Namespace,
+			Workload:        workloadInfo.Internal.Workload,
+		},
+		IP: workloadInfo.Internal.Pods[0].IP,
+	}
+}
 
 func (p *TrafficPeer) Translate() TrafficPeer {
 	//Translates kubernetes workload types to TrafficPeers.

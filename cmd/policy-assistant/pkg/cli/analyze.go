@@ -308,8 +308,6 @@ func shouldIncludeANPandBANP(client *kubernetes.Clientset) (bool, bool) {
 	return includeANP, includeBANP
 }
 
-
-
 func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string, port int, protocol string, trafficPath string) {
 	var sourceWorkloadInfo matcher.TrafficPeer
 	var destinationWorkloadInfo matcher.TrafficPeer
@@ -322,54 +320,54 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 	if trafficPath != "" {
 		allTraffics, err := json.ParseFile[[]*matcher.Traffic](trafficPath)
 		utils.DoOrDie(err)
-for _, traffic := range *allTraffics {
-		    var podA, podB *matcher.TrafficPeer
-		    
-		    // Determine source and destination peer information
-		    sourceInternal := traffic.Source.Internal
-		    destinationInternal := traffic.Destination.Internal
-		
-		    podA = matcher.CreateTrafficPeer(traffic.Source.IP, nil)
-		    podB = matcher.CreateTrafficPeer(traffic.Destination.IP, nil)
-		
-		    // Resolve internal peer info based on workloads
-		    //sourcePeer := GetInternalPeerInfo(sourceInternal.Workload)
-		    //destinationPeer := GetInternalPeerInfo(destinationInternal.Workload)
-		
-		    // Update podA and podB if internal information is available
-		    if sourceInternal != nil {
-		        podA = matcher.CreateTrafficPeer(traffic.Source.IP, &matcher.InternalPeer{
-		            PodLabels:       sourceInternal.PodLabels,
-		            NamespaceLabels: sourceInternal.NamespaceLabels,
-		            Namespace:       sourceInternal.Namespace,
-		            Workload:        sourceInternal.Workload,
-		        })
-		    }
-		    
-		    if destinationInternal != nil {
-		        podB = matcher.CreateTrafficPeer(traffic.Destination.IP, &matcher.InternalPeer{
-		            PodLabels:       destinationInternal.PodLabels,
-		            NamespaceLabels: destinationInternal.NamespaceLabels,
-		            Namespace:       destinationInternal.Namespace,
-		            Workload:        destinationInternal.Workload,
-		        })
-		    }
-		
-		    // Special case handling for workload-specific traffic (internal vs. external)
-		    if sourceInternal != nil && destinationInternal != nil {
-		        if sourceInternal.Workload != "" && destinationInternal.Workload != "" {
-		            podA = matcher.GetInternalPeerInfo(sourceInternal.Workload)
-		            podB = matcher.GetInternalPeerInfo(destinationInternal.Workload)
-		        } else if sourceInternal.Workload != "" {
-		            podA = matcher.GetInternalPeerInfo(sourceInternal.Workload)
-		        } else if destinationInternal.Workload != "" {
-		            podB = matcher.GetInternalPeerInfo(destinationInternal.Workload)
-		        }
-		    }
-		
-		    // Append the resolved traffic to the allTraffic slice
-		    allTraffic = append(allTraffic, matcher.CreateTraffic(podA, podB, traffic.ResolvedPort, string(traffic.Protocol)))
-}
+		for _, traffic := range *allTraffics {
+			var podA, podB *matcher.TrafficPeer
+
+			// Determine source and destination peer information
+			sourceInternal := traffic.Source.Internal
+			destinationInternal := traffic.Destination.Internal
+
+			podA = matcher.CreateTrafficPeer(traffic.Source.IP, nil)
+			podB = matcher.CreateTrafficPeer(traffic.Destination.IP, nil)
+
+			// Resolve internal peer info based on workloads
+			//sourcePeer := GetInternalPeerInfo(sourceInternal.Workload)
+			//destinationPeer := GetInternalPeerInfo(destinationInternal.Workload)
+
+			// Update podA and podB if internal information is available
+			if sourceInternal != nil {
+				podA = matcher.CreateTrafficPeer(traffic.Source.IP, &matcher.InternalPeer{
+					PodLabels:       sourceInternal.PodLabels,
+					NamespaceLabels: sourceInternal.NamespaceLabels,
+					Namespace:       sourceInternal.Namespace,
+					Workload:        sourceInternal.Workload,
+				})
+			}
+
+			if destinationInternal != nil {
+				podB = matcher.CreateTrafficPeer(traffic.Destination.IP, &matcher.InternalPeer{
+					PodLabels:       destinationInternal.PodLabels,
+					NamespaceLabels: destinationInternal.NamespaceLabels,
+					Namespace:       destinationInternal.Namespace,
+					Workload:        destinationInternal.Workload,
+				})
+			}
+
+			// Special case handling for workload-specific traffic (internal vs. external)
+			if sourceInternal != nil && destinationInternal != nil {
+				if sourceInternal.Workload != "" && destinationInternal.Workload != "" {
+					podA = matcher.GetInternalPeerInfo(sourceInternal.Workload)
+					podB = matcher.GetInternalPeerInfo(destinationInternal.Workload)
+				} else if sourceInternal.Workload != "" {
+					podA = matcher.GetInternalPeerInfo(sourceInternal.Workload)
+				} else if destinationInternal.Workload != "" {
+					podB = matcher.GetInternalPeerInfo(destinationInternal.Workload)
+				}
+			}
+
+			// Append the resolved traffic to the allTraffic slice
+			allTraffic = append(allTraffic, matcher.CreateTraffic(podA, podB, traffic.ResolvedPort, string(traffic.Protocol)))
+		}
 	} else {
 
 		if protocol != "TCP" && protocol != "UDP" && protocol != "SCTP" {
