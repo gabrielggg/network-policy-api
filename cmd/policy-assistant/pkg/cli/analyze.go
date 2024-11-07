@@ -308,39 +308,7 @@ func shouldIncludeANPandBANP(client *kubernetes.Clientset) (bool, bool) {
 	return includeANP, includeBANP
 }
 
-func createTrafficPeer(ip string, internal *matcher.InternalPeer) *matcher.TrafficPeer {
-		    return &matcher.TrafficPeer{
-		        IP:       ip,
-		        Internal: internal,
-		    }
-		}
-		
-		// Helper function to create Traffic objects
-		func createTraffic(source, destination *matcher.TrafficPeer, resolvedPort int, protocol string) *matcher.Traffic {
-		    return &matcher.Traffic{
-		        Source:       source,
-		        Destination:  destination,
-		        ResolvedPort: resolvedPort,
-		        Protocol:     v1.Protocol(protocol),
-		    }
-		}
-		
-		// Helper function to get internal TrafficPeer info from workload string
-		func getInternalPeerInfo(workload string) *matcher.TrafficPeer {
-		    if workload == "" {
-		        return nil
-		    }
-		    workloadInfo := matcher.WorkloadStringToTrafficPeer(workload)
-		    return &matcher.TrafficPeer{
-		        Internal: &matcher.InternalPeer{
-		            PodLabels:       workloadInfo.Internal.PodLabels,
-		            NamespaceLabels: workloadInfo.Internal.NamespaceLabels,
-		            Namespace:       workloadInfo.Internal.Namespace,
-		            Workload:        workloadInfo.Internal.Workload,
-		        },
-		        IP: workloadInfo.Internal.Pods[0].IP,
-		    }
-		}
+
 
 func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string, port int, protocol string, trafficPath string) {
 	var sourceWorkloadInfo matcher.TrafficPeer
