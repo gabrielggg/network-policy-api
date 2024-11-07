@@ -118,7 +118,7 @@ func CreateTrafficPeer(ip string, internal *InternalPeer) *TrafficPeer {
 		}
 		
 		// Helper function to create Traffic objects
-		func createTraffic(source, destination *TrafficPeer, resolvedPort int, protocol string) *Traffic {
+		func CreateTraffic(source, destination *TrafficPeer, resolvedPort int, protocol string) *Traffic {
 		    return &Traffic{
 		        Source:       source,
 		        Destination:  destination,
