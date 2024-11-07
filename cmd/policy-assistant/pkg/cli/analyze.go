@@ -368,7 +368,7 @@ for _, traffic := range *allTraffics {
 		    }
 		
 		    // Append the resolved traffic to the allTraffic slice
-		    allTraffic = append(allTraffic, createTraffic(podA, podB, traffic.ResolvedPort, string(traffic.Protocol)))
+		    allTraffic = append(allTraffic, CreateTraffic(podA, podB, traffic.ResolvedPort, string(traffic.Protocol)))
 }
 	} else {
 
