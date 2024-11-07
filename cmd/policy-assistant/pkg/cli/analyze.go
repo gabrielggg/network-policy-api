@@ -308,20 +308,7 @@ func shouldIncludeANPandBANP(client *kubernetes.Clientset) (bool, bool) {
 	return includeANP, includeBANP
 }
 
-func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string, port int, protocol string, trafficPath string) {
-	var sourceWorkloadInfo matcher.TrafficPeer
-	var destinationWorkloadInfo matcher.TrafficPeer
-	var allTraffic []*matcher.Traffic
-
-	if trafficPath != "" && (sourceWorkloadTraffic != "" || destinationWorkloadTraffic != "" || port != 0 || protocol != "") {
-		logrus.Fatalf("%+v", errors.Errorf("If using traffic path, you can't input traffic via CLI and viceversa"))
-	}
-
-	if trafficPath != "" {
-		allTraffics, err := json.ParseFile[[]*matcher.Traffic](trafficPath)
-		utils.DoOrDie(err)
-		// Helper function to create a TrafficPeer from IP or internal info
-		func createTrafficPeer(ip string, internal *matcher.InternalPeer) *matcher.TrafficPeer {
+func createTrafficPeer(ip string, internal *matcher.InternalPeer) *matcher.TrafficPeer {
 		    return &matcher.TrafficPeer{
 		        IP:       ip,
 		        Internal: internal,
@@ -354,6 +341,21 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 		        IP: workloadInfo.Internal.Pods[0].IP,
 		    }
 		}
+
+func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, destinationWorkloadTraffic string, port int, protocol string, trafficPath string) {
+	var sourceWorkloadInfo matcher.TrafficPeer
+	var destinationWorkloadInfo matcher.TrafficPeer
+	var allTraffic []*matcher.Traffic
+
+	if trafficPath != "" && (sourceWorkloadTraffic != "" || destinationWorkloadTraffic != "" || port != 0 || protocol != "") {
+		logrus.Fatalf("%+v", errors.Errorf("If using traffic path, you can't input traffic via CLI and viceversa"))
+	}
+
+	if trafficPath != "" {
+		allTraffics, err := json.ParseFile[[]*matcher.Traffic](trafficPath)
+		utils.DoOrDie(err)
+		// Helper function to create a TrafficPeer from IP or internal info
+		
 		
 		for _, traffic := range *allTraffics {
 		    var podA, podB *matcher.TrafficPeer
