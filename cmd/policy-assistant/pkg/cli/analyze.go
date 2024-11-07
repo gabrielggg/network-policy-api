@@ -403,7 +403,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 		    }
 		
 		    // Append the resolved traffic to the allTraffic slice
-		    allTraffic = append(allTraffic, createTraffic(podA, podB, traffic.ResolvedPort, v1.Protocol(traffic.Protocol)))
+		    allTraffic = append(allTraffic, createTraffic(podA, podB, traffic.ResolvedPort, string(traffic.Protocol)))
 		}
 
 
