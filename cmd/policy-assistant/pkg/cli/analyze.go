@@ -329,16 +329,16 @@ for _, traffic := range *allTraffics {
 		    sourceInternal := traffic.Source.Internal
 		    destinationInternal := traffic.Destination.Internal
 		
-		    podA = matcher.createTrafficPeer(traffic.Source.IP, nil)
-		    podB = matcher.createTrafficPeer(traffic.Destination.IP, nil)
+		    podA = matcher.CreateTrafficPeer(traffic.Source.IP, nil)
+		    podB = matcher.CreateTrafficPeer(traffic.Destination.IP, nil)
 		
 		    // Resolve internal peer info based on workloads
-		    //sourcePeer := getInternalPeerInfo(sourceInternal.Workload)
-		    //destinationPeer := getInternalPeerInfo(destinationInternal.Workload)
+		    //sourcePeer := GetInternalPeerInfo(sourceInternal.Workload)
+		    //destinationPeer := GetInternalPeerInfo(destinationInternal.Workload)
 		
 		    // Update podA and podB if internal information is available
 		    if sourceInternal != nil {
-		        podA = matcher.createTrafficPeer(traffic.Source.IP, &matcher.InternalPeer{
+		        podA = matcher.CreateTrafficPeer(traffic.Source.IP, &matcher.InternalPeer{
 		            PodLabels:       sourceInternal.PodLabels,
 		            NamespaceLabels: sourceInternal.NamespaceLabels,
 		            Namespace:       sourceInternal.Namespace,
@@ -347,7 +347,7 @@ for _, traffic := range *allTraffics {
 		    }
 		    
 		    if destinationInternal != nil {
-		        podB = matcher.createTrafficPeer(traffic.Destination.IP, &matcher.InternalPeer{
+		        podB = matcher.CreateTrafficPeer(traffic.Destination.IP, &matcher.InternalPeer{
 		            PodLabels:       destinationInternal.PodLabels,
 		            NamespaceLabels: destinationInternal.NamespaceLabels,
 		            Namespace:       destinationInternal.Namespace,
@@ -358,12 +358,12 @@ for _, traffic := range *allTraffics {
 		    // Special case handling for workload-specific traffic (internal vs. external)
 		    if sourceInternal != nil && destinationInternal != nil {
 		        if sourceInternal.Workload != "" && destinationInternal.Workload != "" {
-		            podA = matcher.getInternalPeerInfo(sourceInternal.Workload)
-		            podB = matcher.getInternalPeerInfo(destinationInternal.Workload)
+		            podA = matcher.GetInternalPeerInfo(sourceInternal.Workload)
+		            podB = matcher.GetInternalPeerInfo(destinationInternal.Workload)
 		        } else if sourceInternal.Workload != "" {
-		            podA = matcher.getInternalPeerInfo(sourceInternal.Workload)
+		            podA = matcher.GetInternalPeerInfo(sourceInternal.Workload)
 		        } else if destinationInternal.Workload != "" {
-		            podB = matcher.getInternalPeerInfo(destinationInternal.Workload)
+		            podB = matcher.GetInternalPeerInfo(destinationInternal.Workload)
 		        }
 		    }
 		
