@@ -59,7 +59,7 @@ func labelsToString(labels map[string]string) string {
 }
 
 // Helper function to generate the string for source or destination
-func (t *Traffic) formatPeer(peer *matcher.TrafficPeer) string {
+func (t *Traffic) formatPeer(peer *TrafficPeer) string {
     if peer.Internal == nil {
         return fmt.Sprintf("%s", peer.IP)
     }
