@@ -321,7 +321,7 @@ func createTrafficPeer(ip string, internal *matcher.InternalPeer) *matcher.Traff
 		        Source:       source,
 		        Destination:  destination,
 		        ResolvedPort: resolvedPort,
-		        Protocol:     protocol,
+		        Protocol:     v1.Protocol(protocol),
 		    }
 		}
 		
@@ -403,7 +403,7 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 		    }
 		
 		    // Append the resolved traffic to the allTraffic slice
-		    allTraffic = append(allTraffic, createTraffic(podA, podB, traffic.ResolvedPort, traffic.Protocol))
+		    allTraffic = append(allTraffic, createTraffic(podA, podB, traffic.ResolvedPort, v1.Protocol(traffic.Protocol)))
 		}
 
 
