@@ -110,16 +110,16 @@ func (p *TrafficPeer) IsExternal() bool {
 	return p.Internal == nil
 }
 
-func createTrafficPeer(ip string, internal *matcher.InternalPeer) *matcher.TrafficPeer {
-		    return &matcher.TrafficPeer{
+func createTrafficPeer(ip string, internal *InternalPeer) *TrafficPeer {
+		    return &TrafficPeer{
 		        IP:       ip,
 		        Internal: internal,
 		    }
 		}
 		
 		// Helper function to create Traffic objects
-		func createTraffic(source, destination *matcher.TrafficPeer, resolvedPort int, protocol string) *matcher.Traffic {
-		    return &matcher.Traffic{
+		func createTraffic(source, destination *TrafficPeer, resolvedPort int, protocol string) *Traffic {
+		    return &Traffic{
 		        Source:       source,
 		        Destination:  destination,
 		        ResolvedPort: resolvedPort,
@@ -128,13 +128,13 @@ func createTrafficPeer(ip string, internal *matcher.InternalPeer) *matcher.Traff
 		}
 		
 		// Helper function to get internal TrafficPeer info from workload string
-		func getInternalPeerInfo(workload string) *matcher.TrafficPeer {
+		func getInternalPeerInfo(workload string) *TrafficPeer {
 		    if workload == "" {
 		        return nil
 		    }
-		    workloadInfo := matcher.WorkloadStringToTrafficPeer(workload)
-		    return &matcher.TrafficPeer{
-		        Internal: &matcher.InternalPeer{
+		    workloadInfo := WorkloadStringToTrafficPeer(workload)
+		    return &TrafficPeer{
+		        Internal: &InternalPeer{
 		            PodLabels:       workloadInfo.Internal.PodLabels,
 		            NamespaceLabels: workloadInfo.Internal.NamespaceLabels,
 		            Namespace:       workloadInfo.Internal.Namespace,
