@@ -58,100 +58,35 @@ func labelsToString(labels map[string]string) string {
 	return strings.Join(slice.Map(format, slice.Sort(maps.Keys(labels))), "\n")
 }
 
-func (t *Traffic) PrettyString() string {
-	var src string
-	var dst string
-	if t == nil || t.Source == nil || t.Destination == nil {
-		return "<undefined>"
-	}
+// Helper function to generate the string for source or destination
+func (t *Traffic) formatPeer(peer *matcher.TrafficPeer) string {
+    if peer.Internal == nil {
+        return fmt.Sprintf("%s", peer.IP)
+    }
 
-	if t.Source.Internal == nil && t.Destination.Internal == nil {
-		src = fmt.Sprintf("%s", t.Source.IP)
-		dst = fmt.Sprintf("%s", t.Destination.IP)
-	} else if t.Source.Internal == nil && t.Destination.Internal != nil {
-		if t.Destination.Internal.Workload != "" {
-			src = fmt.Sprintf("%s", t.Source.IP)
-			dst = t.Destination.Internal.Workload
-			if dst == "" {
-				if t.Destination.Internal == nil {
-					return "<undefined>"
-				}
+    // If there is a workload, return it
+    if peer.Internal.Workload != "" {
+        return peer.Internal.Workload
+    }
 
-				dst = fmt.Sprintf("%s/%s", t.Destination.Internal.Namespace, labelsToStringSlim(t.Destination.Internal.PodLabels))
-			}
-
-		} else {
-			src = fmt.Sprintf("%s", t.Source.IP)
-			dst = fmt.Sprintf("%s/%s", t.Destination.Internal.Namespace, labelsToStringSlim(t.Destination.Internal.PodLabels))
-
-		}
-	} else if t.Source.Internal != nil && t.Destination.Internal == nil {
-		if t.Source.Internal.Workload != "" {
-			dst = fmt.Sprintf("%s", t.Destination.IP)
-			src = t.Source.Internal.Workload
-			if src == "" {
-				if t.Source.Internal == nil {
-					return "<undefined>"
-				}
-
-				src = fmt.Sprintf("%s/%s", t.Source.Internal.Namespace, labelsToStringSlim(t.Source.Internal.PodLabels))
-			}
-
-		} else {
-			dst = fmt.Sprintf("%s", t.Destination.IP)
-			src = fmt.Sprintf("%s/%s", t.Source.Internal.Namespace, labelsToStringSlim(t.Source.Internal.PodLabels))
-
-		}
-	} else {
-		if t.Source.Internal.Workload != "" && t.Destination.Internal.Workload != "" {
-			src = t.Source.Internal.Workload
-			if src == "" {
-				if t.Source.Internal == nil {
-					return "<undefined>"
-				}
-
-				src = fmt.Sprintf("%s/%s", t.Source.Internal.Namespace, labelsToStringSlim(t.Source.Internal.PodLabels))
-			}
-			dst = t.Destination.Internal.Workload
-			if dst == "" {
-				if t.Destination.Internal == nil {
-					return "<undefined>"
-				}
-
-				dst = fmt.Sprintf("%s/%s", t.Destination.Internal.Namespace, labelsToStringSlim(t.Destination.Internal.PodLabels))
-			}
-
-		} else if t.Source.Internal.Workload != "" && t.Destination.Internal.Workload == "" {
-			src = t.Source.Internal.Workload
-			if src == "" {
-				if t.Source.Internal == nil {
-					return "<undefined>"
-				}
-
-				src = fmt.Sprintf("%s/%s", t.Source.Internal.Namespace, labelsToStringSlim(t.Source.Internal.PodLabels))
-			}
-			dst = fmt.Sprintf("%s/%s", t.Destination.Internal.Namespace, labelsToStringSlim(t.Destination.Internal.PodLabels))
-
-		} else if t.Source.Internal.Workload == "" && t.Destination.Internal.Workload != "" {
-			dst = t.Destination.Internal.Workload
-			if dst == "" {
-				if t.Destination.Internal == nil {
-					return "<undefined>"
-				}
-
-				dst = fmt.Sprintf("%s/%s", t.Destination.Internal.Namespace, labelsToStringSlim(t.Destination.Internal.PodLabels))
-			}
-			src = fmt.Sprintf("%s/%s", t.Source.Internal.Namespace, labelsToStringSlim(t.Source.Internal.PodLabels))
-
-		} else {
-			src = fmt.Sprintf("%s/%s", t.Source.Internal.Namespace, labelsToStringSlim(t.Source.Internal.PodLabels))
-			dst = fmt.Sprintf("%s/%s", t.Destination.Internal.Namespace, labelsToStringSlim(t.Destination.Internal.PodLabels))
-
-		}
-	}
-
-	return fmt.Sprintf("%s -> %s:%d (%s)", src, dst, t.ResolvedPort, t.Protocol)
+    // Otherwise, return namespace and labels
+    return fmt.Sprintf("%s/%s", peer.Internal.Namespace, labelsToStringSlim(peer.Internal.PodLabels))
 }
+
+// PrettyString refactor to reduce nested if/else blocks
+func (t *Traffic) PrettyString() string {
+    if t == nil || t.Source == nil || t.Destination == nil {
+        return "<undefined>"
+    }
+
+    // Format source and destination peers
+    src := t.formatPeer(t.Source)
+    dst := t.formatPeer(t.Destination)
+
+    // If both source and destination are internal, we need to check the workload conditions
+    return fmt.Sprintf("%s -> %s:%d (%s)", src, dst, t.ResolvedPort, t.Protocol)
+}
+
 
 func labelsToStringSlim(labels map[string]string) string {
 	format := func(k string) string { return fmt.Sprintf("%s=%s", k, labels[k]) }
