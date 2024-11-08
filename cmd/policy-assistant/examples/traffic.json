@@ -96,6 +96,22 @@
     },
     "Destination": {
       "Internal": {
+        "Workload": "default/deployment/aks-helloworld-one",
+        "Namespace": "default"
+      }
+    },
+    "Protocol": "TCP",
+    "ResolvedPort": 81,
+    "ResolvedPortName": "serve-81-tcp"
+  },{
+    "Source": {
+      "Internal": {
+        "Workload": "kube-system/daemonset/azure-npm",
+        "Namespace": "kube-system"
+      }
+    },
+    "Destination": {
+      "Internal": {
         "PodLabels": {"pod": "b"},
         "NamespaceLabels": {"ns": "y"},
         "Namespace": "y"
