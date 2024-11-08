@@ -133,6 +133,16 @@ func GetInternalPeerInfo(workload string) *TrafficPeer {
 		return nil
 	}
 	workloadInfo := WorkloadStringToTrafficPeer(workload)
+	if workloadInfo.Internal.Pods == nil  {
+		return &TrafficPeer{
+		        Internal: &InternalPeer{
+		            PodLabels:       workloadInfo.Internal.PodLabels,
+		            NamespaceLabels: workloadInfo.Internal.NamespaceLabels,
+		            Namespace:       workloadInfo.Internal.Namespace,
+		            Workload:        workloadInfo.Internal.Workload,
+		        },
+		}
+	}
 	return &TrafficPeer{
 		Internal: &InternalPeer{
 			PodLabels:       workloadInfo.Internal.PodLabels,
