@@ -140,7 +140,7 @@ func CreateTrafficPeer(ip string, internal *InternalPeer) *TrafficPeer {
 		            NamespaceLabels: workloadInfo.Internal.NamespaceLabels,
 		            Namespace:       workloadInfo.Internal.Namespace,
 		            Workload:        workloadInfo.Internal.Workload,
-		        }
+		        },
 		    }
 		}
 		    return &TrafficPeer{
