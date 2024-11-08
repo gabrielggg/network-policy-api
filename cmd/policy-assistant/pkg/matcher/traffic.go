@@ -134,7 +134,14 @@ func CreateTrafficPeer(ip string, internal *InternalPeer) *TrafficPeer {
 		    }
 		    workloadInfo := WorkloadStringToTrafficPeer(workload)
 		    if workloadInfo.Internal.Pods == nil  {
-			return nil
+			return &TrafficPeer{
+		        Internal: &InternalPeer{
+		            PodLabels:       workloadInfo.Internal.PodLabels,
+		            NamespaceLabels: workloadInfo.Internal.NamespaceLabels,
+		            Namespace:       workloadInfo.Internal.Namespace,
+		            Workload:        workloadInfo.Internal.Workload,
+		        }
+		    }
 		}
 		    return &TrafficPeer{
 		        Internal: &InternalPeer{
