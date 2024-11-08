@@ -133,6 +133,9 @@ func CreateTrafficPeer(ip string, internal *InternalPeer) *TrafficPeer {
 		        return nil
 		    }
 		    workloadInfo := WorkloadStringToTrafficPeer(workload)
+		    if workloadInfo.Internal.Pods == nil  {
+			return
+		}
 		    return &TrafficPeer{
 		        Internal: &InternalPeer{
 		            PodLabels:       workloadInfo.Internal.PodLabels,
