@@ -12,8 +12,8 @@ spec:
   - name: "deny-81"
     action: "Deny"
     from:
-    - namespaces:
-        namespaceSelector: {}
+    - ipBlock:
+        cidr: 192.168.1.0/24
     ports:
       - portNumber:
           protocol: TCP
