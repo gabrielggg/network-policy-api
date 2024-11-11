@@ -354,16 +354,19 @@ for _, traffic := range *allTraffics {
 		    }
 		
 		    // Special case handling for workload-specific traffic (internal vs. external)
-		    if sourceInternal != nil && destinationInternal != nil {
-		        if sourceInternal.Workload != "" && destinationInternal.Workload != "" {
+		    if sourceInternal != nil  {
+		        if sourceInternal.Workload != "" {
 		            podA = matcher.GetInternalPeerInfo(sourceInternal.Workload)
-		            podB = matcher.GetInternalPeerInfo(destinationInternal.Workload)
-		        } else if sourceInternal.Workload != "" {
-		            podA = matcher.GetInternalPeerInfo(sourceInternal.Workload)
-		        } else if destinationInternal.Workload != "" {
-		            podB = matcher.GetInternalPeerInfo(destinationInternal.Workload)
-		        }
+		        } 
 		    }
+
+		    if destinationInternal != nil  {
+		        if destinationInternal.Workload != "" {
+		            podB = matcher.GetInternalPeerInfo(destinationInternal.Workload)
+		        } 
+		    }
+
+
 		
 		    // Append the resolved traffic to the allTraffic slice
 		    allTraffic = append(allTraffic, matcher.CreateTraffic(podA, podB, traffic.ResolvedPort, string(traffic.Protocol)))
