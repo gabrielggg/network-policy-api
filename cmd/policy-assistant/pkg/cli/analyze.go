@@ -352,17 +352,17 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 			}
 
 			// Special case handling for workload-specific traffic (internal vs. external)
-		    if sourceInternal != nil  {
-		        if sourceInternal.Workload != "" {
-		            podA = matcher.GetInternalPeerInfo(sourceInternal.Workload)
-		        } 
-		    }
+			if sourceInternal != nil {
+				if sourceInternal.Workload != "" {
+					podA = matcher.GetInternalPeerInfo(sourceInternal.Workload)
+				}
+			}
 
-		    if destinationInternal != nil  {
-		        if destinationInternal.Workload != "" {
-		            podB = matcher.GetInternalPeerInfo(destinationInternal.Workload)
-		        } 
-		    }
+			if destinationInternal != nil {
+				if destinationInternal.Workload != "" {
+					podB = matcher.GetInternalPeerInfo(destinationInternal.Workload)
+				}
+			}
 
 			// Append the resolved traffic to the allTraffic slice
 			allTraffic = append(allTraffic, matcher.CreateTraffic(podA, podB, traffic.ResolvedPort, string(traffic.Protocol)))
