@@ -357,17 +357,13 @@ for _, traffic := range *allTraffics {
 		    if sourceInternal != nil  {
 		        if sourceInternal.Workload != "" {
 		            podA = matcher.GetInternalPeerInfo(sourceInternal.Workload)
-		        } else {
-			    continue	
-			}
+		        }
 		    }
 
 		    if destinationInternal != nil  {
 		        if destinationInternal.Workload != "" {
 		            podB = matcher.GetInternalPeerInfo(destinationInternal.Workload)
-		        } else {
-			    continue	
-			} 
+		        }
 		    }
 
 
