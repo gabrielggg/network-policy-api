@@ -104,8 +104,8 @@ func SetupAnalyzeCommand() *cobra.Command {
 	command.Flags().StringVar(&args.TrafficPath, "traffic-path", "", "path to json traffic file, containing of a list of traffic objects")
 	command.Flags().StringVar(&args.ProbePath, "probe-path", "", "path to json model file for synthetic probe")
 	command.Flags().DurationVar(&args.Timeout, "kube-client-timeout", DefaultTimeout, "kube client timeout")
-	command.Flags().StringVar(&args.SourceWorkloadTraffic, "source-workload-traffic", "", "Source workload traffic in this form namespace/workloadType/workloadName")
-	command.Flags().StringVar(&args.DestinationWorkloadTraffic, "destination-workload-traffic", "", "Destination workload traffic Name in this form namespace/workloadType/workloadName")
+	command.Flags().StringVar(&args.SourceWorkloadTraffic, "src-workload", "", "Source workload traffic in this form namespace/workloadType/workloadName")
+	command.Flags().StringVar(&args.DestinationWorkloadTraffic, "dst-workload", "", "Destination workload traffic Name in this form namespace/workloadType/workloadName")
 	command.Flags().IntVar(&args.Port, "port", 0, "port used for testing network policies")
 	command.Flags().StringVar(&args.Protocol, "protocol", "", "protocol used for testing network policies")
 
@@ -357,13 +357,17 @@ for _, traffic := range *allTraffics {
 		    if sourceInternal != nil  {
 		        if sourceInternal.Workload != "" {
 		            podA = matcher.GetInternalPeerInfo(sourceInternal.Workload)
-		        } 
+		        } else {
+			    continue	
+			}
 		    }
 
 		    if destinationInternal != nil  {
 		        if destinationInternal.Workload != "" {
 		            podB = matcher.GetInternalPeerInfo(destinationInternal.Workload)
-		        } 
+		        } else {
+			    continue	
+			} 
 		    }
 
 
