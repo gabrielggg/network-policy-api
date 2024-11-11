@@ -317,6 +317,8 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 
 	if trafficPath != "" && (sourceWorkloadTraffic != "" || destinationWorkloadTraffic != "" || port != 0 || protocol != "") {
 		logrus.Fatalf("%+v", errors.Errorf("If using traffic path, you can't input traffic via CLI and viceversa"))
+	} else if trafficPath == "" && (sourceWorkloadTraffic == "" || destinationWorkloadTraffic == "" || port == 0 || protocol == "") {
+		logrus.Fatalf("%+v", errors.Errorf("For this mode, you must either set --traffic-path or set all of --source-workload-traffic (<namespace>/<workloadType>/workloadName), --destination-workload-traffic (<namespace>/<workloadType>/workloadName), --port (integer from 0 to 65535) and --protocol (TCP, UDP and SCTP) parameters"))
 	}
 
 	if trafficPath != "" {
