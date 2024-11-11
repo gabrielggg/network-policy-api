@@ -333,11 +333,7 @@ for _, traffic := range *allTraffics {
 		
 		    podA = matcher.CreateTrafficPeer(traffic.Source.IP, nil)
 		    podB = matcher.CreateTrafficPeer(traffic.Destination.IP, nil)
-		
-		    // Resolve internal peer info based on workloads
-		    //sourcePeer := GetInternalPeerInfo(sourceInternal.Workload)
-		    //destinationPeer := GetInternalPeerInfo(destinationInternal.Workload)
-		
+				
 		    // Update podA and podB if internal information is available
 		    if sourceInternal != nil {
 		        podA = matcher.CreateTrafficPeer(traffic.Source.IP, &matcher.InternalPeer{
