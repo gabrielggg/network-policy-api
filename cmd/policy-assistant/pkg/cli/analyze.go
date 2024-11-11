@@ -315,6 +315,8 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 
 	if trafficPath != "" && (sourceWorkloadTraffic != "" || destinationWorkloadTraffic != "" || port != 0 || protocol != "") {
 		logrus.Fatalf("%+v", errors.Errorf("If using traffic path, you can't input traffic via CLI and viceversa"))
+	} else if trafficPath == "" && (sourceWorkloadTraffic == "" || destinationWorkloadTraffic == "" || port == 0 || protocol == "") {
+		logrus.Fatalf("%+v", errors.Errorf("For this mode, you must either set --traffic-path or set all of --source-workload-traffic (<namespace>/<workloadType>/workloadName), --destination-workload-traffic (<namespace>/<workloadType>/workloadName), --port (integer from 0 to 65535) and --protocol (TCP, UDP and SCTP) parameters"))
 	}
 
 	if trafficPath != "" {
@@ -329,10 +331,6 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 
 			podA = matcher.CreateTrafficPeer(traffic.Source.IP, nil)
 			podB = matcher.CreateTrafficPeer(traffic.Destination.IP, nil)
-
-			// Resolve internal peer info based on workloads
-			//sourcePeer := GetInternalPeerInfo(sourceInternal.Workload)
-			//destinationPeer := GetInternalPeerInfo(destinationInternal.Workload)
 
 			// Update podA and podB if internal information is available
 			if sourceInternal != nil {
@@ -354,16 +352,17 @@ func VerdictWalkthrough(policies *matcher.Policy, sourceWorkloadTraffic string, 
 			}
 
 			// Special case handling for workload-specific traffic (internal vs. external)
-			if sourceInternal != nil && destinationInternal != nil {
-				if sourceInternal.Workload != "" && destinationInternal.Workload != "" {
-					podA = matcher.GetInternalPeerInfo(sourceInternal.Workload)
-					podB = matcher.GetInternalPeerInfo(destinationInternal.Workload)
-				} else if sourceInternal.Workload != "" {
-					podA = matcher.GetInternalPeerInfo(sourceInternal.Workload)
-				} else if destinationInternal.Workload != "" {
-					podB = matcher.GetInternalPeerInfo(destinationInternal.Workload)
-				}
-			}
+		    if sourceInternal != nil  {
+		        if sourceInternal.Workload != "" {
+		            podA = matcher.GetInternalPeerInfo(sourceInternal.Workload)
+		        } 
+		    }
+
+		    if destinationInternal != nil  {
+		        if destinationInternal.Workload != "" {
+		            podB = matcher.GetInternalPeerInfo(destinationInternal.Workload)
+		        } 
+		    }
 
 			// Append the resolved traffic to the allTraffic slice
 			allTraffic = append(allTraffic, matcher.CreateTraffic(podA, podB, traffic.ResolvedPort, string(traffic.Protocol)))
